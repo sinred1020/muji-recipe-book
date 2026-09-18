@@ -181,6 +181,15 @@ const recipes=[
 {id:15,cat:"국·찌개",icon:"🫘",name:"초보 된장찌개",time:"25분",level:"초보",desc:"된장 하나만 잘 풀어도 집밥 느낌이 나는 기본 찌개.",ingredients:["물 650ml","된장 2큰술","감자 1개","애호박 1/2개","양파 1/2개","두부 1/2모","다진 마늘 1/2큰술","대파 1/2대","고춧가루 1/2큰술(선택)"],steps:["물 650ml에 된장을 잘 풀고 끓여요.","감자와 양파를 넣고 8~10분 끓여요.","애호박과 다진 마늘을 넣고 5분 끓여요.","두부와 대파를 넣고 3~5분 더 끓여요.","원하면 고춧가루를 넣고 간을 봐요. 부족하면 된장을 아주 조금 추가해요."],tip:"된장은 제품마다 짠 정도가 달라서 처음부터 많이 넣지 말고 마지막에 간을 맞춰요."}
 ];
 
+try {
+  const savedCustomRecipes = JSON.parse(localStorage.getItem("mujiCustomRecipes") || "[]");
+  if (Array.isArray(savedCustomRecipes) && savedCustomRecipes.length) {
+    recipes.unshift(...savedCustomRecipes);
+  }
+} catch (e) {
+  console.warn("저장된 내 레시피를 불러오지 못했어요.", e);
+}
+
 let active="전체";
 const fav=JSON.parse(localStorage.getItem("recipeFav")||"[]");
 
@@ -201,7 +210,7 @@ function render(){
  document.getElementById("count").textContent=`${list.length}개`;
  document.getElementById("empty").style.display=list.length?"none":"block";
  document.getElementById("grid").innerHTML=list.map(r=>`
-  <article class="card" onclick="openRecipe(${r.id})">
+  <article class="card" onclick="openRecipe(${JSON.stringify(r.id)})">
     <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
     <div class="icon">${r.icon}</div>
     <h3>${r.name}</h3>
@@ -210,7 +219,8 @@ function render(){
   </article>`).join("");
 }
 function openRecipe(id){
- const r=recipes.find(x=>x.id===id);
+ const r=recipes.find(x=>String(x.id)===String(id));
+ if(!r){ alert("레시피를 불러오지 못했어요. 페이지를 새로고침해 주세요."); return; }
  document.getElementById("sheet").innerHTML=`
   <button class="close" onclick="closeModal()">×</button>
   <div class="detail-icon">${r.icon}</div>
@@ -428,7 +438,7 @@ function appNav(view){
     document.getElementById("count").textContent=`${list.length}개`;
     document.getElementById("empty").style.display=list.length?"none":"block";
     document.getElementById("grid").innerHTML=list.map(r=>`
-      <article class="card" onclick="openRecipe(${r.id})">
+      <article class="card" onclick="openRecipe(${JSON.stringify(r.id)})">
         <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
         <div class="icon">${r.icon}</div><h3>${r.name}</h3><div class="desc">${r.desc}</div>
         <div class="meta"><span class="tag">👥 2인분</span><span class="tag">⏱ ${r.time}</span><span class="tag">난이도 ${r.level}</span></div>
@@ -444,7 +454,7 @@ function appNav(view){
 function openRecipe(id,cookMode){
   currentRecipeId=id;
   if(typeof window.__originalOpenRecipe==="function") return window.__originalOpenRecipe(id);
-  const r=recipes.find(x=>x.id===id);
+  const r=recipes.find(x=>String(x.id)===String(id));
   if(!r)return;
   const sheet=document.getElementById("sheet");
   if(!sheet)return;
@@ -458,12 +468,12 @@ function openRecipe(id,cookMode){
       <div class="serving-control">
         <div><b>🍚 몇 명이 먹나요?</b><div style="font-size:12px;color:#8b7c71;margin-top:3px">재료 양을 자동으로 계산해요</div></div>
         <div class="serving-buttons">
-          <button onclick="changeServing(${r.id},-1)">−</button>
+          <button onclick="changeServing(${JSON.stringify(r.id)},-1)">−</button>
           <div class="serving-count" id="servingCount-${r.id}">2인분</div>
-          <button onclick="changeServing(${r.id},1)">+</button>
+          <button onclick="changeServing(${JSON.stringify(r.id)},1)">+</button>
         </div>
       </div>
-      <div class="cookbar"><button class="primary" onclick="startCook(${r.id})">🥘 요리모드 시작</button><button onclick="startTimerFromRecipe('${r.time}')">⏱ 타이머</button></div>
+      <div class="cookbar"><button class="primary" onclick="startCook(${JSON.stringify(r.id)})">🥘 요리모드 시작</button><button onclick="startTimerFromRecipe('${r.time}')">⏱ 타이머</button></div>
       <div id="wakeStatus-${r.id}" class="wake-status">💡 요리모드를 시작하면 화면 자동잠금을 최대한 막아줘요.</div>
       <h3>🛒 재료</h3><ul id="ingredients-${r.id}">${r.ingredients.map(x=>`<li>${x}</li>`).join("")}</ul>
       <h3>👩‍🍳 조리순서</h3>
@@ -524,7 +534,7 @@ function fmt(n){
   return Number.isInteger(n)?String(n):String(Math.round(n*10)/10);
 }
 function renderIngredients(id,serving){
-  const r=recipes.find(x=>x.id===id); if(!r)return;
+  const r=recipes.find(x=>String(x.id)===String(id)); if(!r)return;
   document.getElementById("servingCount-"+id).textContent=`${serving}인분`;
   document.getElementById("servingLabel-"+id).textContent=`${serving}인분`;
   const ul=document.getElementById("ingredients-"+id);
