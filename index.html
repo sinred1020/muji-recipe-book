@@ -211,7 +211,7 @@ function render(){
  document.getElementById("empty").style.display=list.length?"none":"block";
  document.getElementById("grid").innerHTML=list.map(r=>`
   <article class="card" onclick="openRecipe(${JSON.stringify(r.id)})">
-    <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
+    <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${JSON.stringify(r.id)},event)">${fav.includes(r.id)?"♥":"♡"}</button>
     <div class="icon">${r.icon}</div>
     <h3>${r.name}</h3>
     <div class="desc">${r.desc}</div>
@@ -439,7 +439,7 @@ function appNav(view){
     document.getElementById("empty").style.display=list.length?"none":"block";
     document.getElementById("grid").innerHTML=list.map(r=>`
       <article class="card" onclick="openRecipe(${JSON.stringify(r.id)})">
-        <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
+        <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${JSON.stringify(r.id)},event)">${fav.includes(r.id)?"♥":"♡"}</button>
         <div class="icon">${r.icon}</div><h3>${r.name}</h3><div class="desc">${r.desc}</div>
         <div class="meta"><span class="tag">👥 2인분</span><span class="tag">⏱ ${r.time}</span><span class="tag">난이도 ${r.level}</span></div>
       </article>`).join("");
