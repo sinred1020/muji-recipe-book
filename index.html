@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘 뭐 해먹지? · 초보 레시피북</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --bg:#fffaf5;--card:#fff;--text:#292421;--muted:#857a72;
+    --accent:#e56b4f;--accent2:#f5b544;--line:#eee3da;--soft:#fff0e8;
+    --shadow:0 10px 30px rgba(87,58,42,.09);
+  }
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  header{padding:44px 20px 34px;background:linear-gradient(135deg,#fff3e9,#fffaf5 55%,#fff0cf);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1050px;margin:auto}
+  .eyebrow{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.08em}
+  h1{font-size:clamp(30px,6vw,52px);line-height:1.05;margin:10px 0 12px;letter-spacing:-.05em}
+  .hero-copy{color:var(--muted);margin:0 0 24px;line-height:1.7}
+  .search{display:flex;gap:10px;background:#fff;padding:8px;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+  .search input{flex:1;border:0;outline:0;font-size:16px;padding:10px 12px;background:transparent}
+  .search button{border:0;background:var(--accent);color:#fff;border-radius:13px;padding:0 18px;font-weight:800;cursor:pointer}
+  .controls{display:flex;gap:8px;overflow:auto;padding:18px 0 4px;scrollbar-width:none}
+  .chip{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;cursor:pointer;color:#625851;font-weight:700}
+  .chip.active{background:#2d2723;color:#fff;border-color:#2d2723}
+  main{padding:28px 20px 70px}
+  .section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:0 0 16px}
+  .section-head h2{margin:0;font-size:22px;letter-spacing:-.03em}
+  .count{font-size:13px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 4px 16px rgba(87,58,42,.04);transition:.18s;cursor:pointer;position:relative}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .icon{font-size:36px}
+  .card h3{margin:12px 0 8px;font-size:20px;letter-spacing:-.04em}
+  .desc{font-size:13px;color:var(--muted);line-height:1.55;min-height:40px}
+  .meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+  .tag{font-size:12px;background:#f8f1eb;border-radius:999px;padding:6px 9px;color:#6d5d52;font-weight:700}
+  .heart{position:absolute;right:16px;top:16px;border:0;background:#fff5ef;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px}
+  .heart.on{background:#ffe2d8}
+  .empty{padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:20px;display:none}
+  .modal{position:fixed;inset:0;background:rgba(35,27,22,.48);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .modal.show{display:flex}
+  .sheet{background:#fffaf7;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:28px 28px 0 0;padding:28px 24px 42px}
+  .close{float:right;border:0;background:#f3e9e2;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer}
+  .detail-icon{font-size:52px}
+  .sheet h2{font-size:32px;letter-spacing:-.05em;margin:5px 0}
+  .detail-desc{color:var(--muted);line-height:1.65}
+  .info{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 26px}
+  .info span{background:#fff0e8;color:#9b4b39;border-radius:999px;padding:8px 11px;font-weight:800;font-size:13px}
+  .sheet h3{font-size:18px;margin:26px 0 11px}
+  .ingredients{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0;padding:0;list-style:none}
+  .ingredients li{background:#fff;border:1px solid var(--line);padding:11px 12px;border-radius:12px;font-size:14px}
+  ol.steps{padding-left:22px}
+  .steps li{padding:8px 0 8px 4px;line-height:1.7}
+  .tip{background:#fff4d9;border-radius:16px;padding:14px 16px;line-height:1.65;color:#705524;font-size:14px}
+  footer{text-align:center;color:#a0958e;font-size:12px;padding:0 20px 35px}
+  @media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}.sheet h2{font-size:28px}.ingredients{grid-template-columns:1fr}header{padding-top:34px}}
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff8f0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="초보 레시피북">
+<link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;초보 레시피북&quot;,&quot;short_name&quot;:&quot;레시피북&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23fffaf5&quot;,&quot;theme_color&quot;:&quot;%23fff8f0&quot;,&quot;icons&quot;:[]}">
+<style>
+:root{--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#fffaf5}
+body{padding-bottom:calc(76px + var(--safe-bottom));overscroll-behavior-y:none}
+button,input{font:inherit}
+button{touch-action:manipulation}
+.card{min-height:190px}
+.heart{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.bottom-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;padding:8px 12px calc(8px + var(--safe-bottom));background:rgba(255,250,245,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(80,50,30,.1);display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bottom-nav button{border:0;background:transparent;border-radius:14px;padding:8px 4px;color:#6f625a;font-size:12px;font-weight:700}
+.bottom-nav button .navicon{display:block;font-size:21px;line-height:22px;margin-bottom:2px}
+.bottom-nav button.active{background:#fff;border:1px solid rgba(120,80,50,.12);color:#3f342d}
+.cookbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;padding:10px 0;background:linear-gradient(#fffaf5 75%,transparent)}
+.cookbar button{flex:1;border:0;border-radius:13px;padding:12px 8px;background:#fff;border:1px solid #eadfd5;font-weight:800}
+.cookbar button.primary{background:#5b4638;color:white;border-color:#5b4638}
+.step.done{opacity:.58}
+.step.done h4{text-decoration:line-through}
+.step-check{appearance:none;width:25px;height:25px;border:2px solid #bbaea4;border-radius:8px;flex:0 0 25px}
+.step-check:checked{background:#5b4638;border-color:#5b4638}
+.step-check:checked:after{content:"✓";color:#fff;display:block;text-align:center;line-height:21px;font-weight:900}
+.timer-box{display:none;position:fixed;z-index:100;left:14px;right:14px;bottom:calc(84px + var(--safe-bottom));background:#3f342d;color:#fff;padding:16px;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.timer-box.show{display:block}
+.timer-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.timer-time{font-size:30px;font-weight:900;letter-spacing:1px}
+.timer-actions button{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;border-radius:10px;padding:8px 10px}
+.install-tip{margin:12px 0;padding:13px 15px;border-radius:16px;background:#fff1e3;border:1px solid #f0d6bc;font-size:13px;line-height:1.55}
+@media(min-width:700px){
+  body{max-width:1050px;margin:auto}
+  .bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(1050px,100%);border-radius:20px 20px 0 0}
+}
+@media(max-width:430px){.card{min-height:175px}.meta{gap:5px}.tag{font-size:11px}}
+</style>
+
+
+<style>
+.serving-control{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px 14px;border:1px solid #eadfd5;border-radius:16px;background:#fff}
+.serving-buttons{display:flex;align-items:center;gap:8px}
+.serving-buttons button{width:38px;height:38px;border:0;border-radius:12px;background:#f5ece4;font-size:20px;font-weight:900}
+.serving-count{min-width:62px;text-align:center;font-weight:900}
+.wake-status{margin:8px 0 14px;padding:10px 12px;border-radius:12px;background:#f7f3ef;font-size:12px;color:#6f625a}
+.wake-status.on{background:#eee8e1;color:#3f342d;font-weight:800}
+</style>
+
+<style id="chatgpt-link-style">
+.ai-recipe-panel{display:none;position:fixed;inset:0;z-index:1000;background:rgba(20,18,15,.45);padding:18px}
+.ai-recipe-card{max-width:560px;margin:5vh auto 0;background:#fffaf5;border-radius:24px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.22);max-height:88vh;overflow:auto}
+.ai-recipe-card h2{margin:0 0 6px;font-size:22px}.ai-sub{margin:0 0 18px;color:#756b63;font-size:13px;line-height:1.5}
+.ai-field{margin:13px 0}.ai-field label{display:block;font-weight:700;font-size:13px;margin-bottom:7px}
+.ai-field input,.ai-field textarea,.ai-field select{width:100%;box-sizing:border-box;border:1px solid #ded4ca;border-radius:13px;padding:12px 13px;background:#fff;font:inherit;outline:none}
+.ai-field textarea{min-height:86px;resize:vertical}.ai-actions{display:flex;gap:8px;margin-top:16px}
+.ai-actions button,.ai-copy{flex:1;border:0;border-radius:13px;padding:13px 10px;font-weight:800;cursor:pointer}
+.ai-primary{background:#111;color:#fff}.ai-secondary{background:#eee7e1;color:#403832}
+.ai-help{margin-top:14px;padding:12px 13px;background:#f4eee8;border-radius:13px;font-size:12px;line-height:1.55;color:#665b53}
+.ai-prompt{margin-top:16px;display:none}.ai-prompt textarea{min-height:210px}
+.ai-copy{width:100%;margin-top:8px;background:#111;color:#fff}
+</style>
+
+</head>
+<body>
+<div class="app-top" style="padding:calc(12px + env(safe-area-inset-top,0px)) 2px 4px;display:flex;align-items:center;justify-content:space-between">
+  <div>
+    <div style="font-size:12px;font-weight:800;letter-spacing:.04em;color:#9b8879">MUJI'S KITCHEN</div>
+    <div style="font-size:25px;font-weight:900;letter-spacing:-.04em">🍚 무지의 레시피북</div>
+  </div>
+  <button onclick="showInstallTip()" aria-label="홈 화면에 추가 안내" style="border:0;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 4px 14px rgba(70,45,25,.08)">📱</button>
+</div>
+<div id="installTip" class="install-tip" style="display:none">
+  <b>아이폰/아이패드에서 앱처럼 쓰기</b><br>
+  Safari에서 이 파일을 연 뒤 <b>공유 → 홈 화면에 추가</b>를 선택하면 홈 화면 아이콘으로 바로 열 수 있어요.
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">MY FIRST RECIPE BOOK 🍳</div>
+    <h1>오늘 뭐 해먹지?</h1>
+    <p class="hero-copy">요리 초보를 위한 실패 적은 레시피.<br>모든 메뉴는 <b>2인분 기준</b>으로 만들었어요.</p>
+    <div class="search">
+      <input id="search" placeholder="예: 스팸, 감자, 김치, 계란..." autocomplete="off">
+      <button onclick="render()">검색</button>
+    </div>
+    <div class="controls" id="filters"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="section-head">
+    <h2>🍴 레시피</h2><span class="count" id="count"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">찾는 레시피가 없어요 🥺<br>다른 재료나 메뉴 이름으로 검색해보세요.</div>
+</main>
+<footer>천천히 해도 괜찮아. 오늘 한 끼부터 시작! ♡</footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const recipes=[
+{id:1,cat:"국·찌개",icon:"🌶️",name:"스팸 고추장찌개",time:"25분",level:"초보",desc:"스팸과 감자로 만드는 진하고 칼칼한 밥도둑.",ingredients:["물 700ml","스팸 1캔(약 200g)","감자 1~2개","양파 1/2개","대파 1/2대","청양고추 1개(선택)","다진 마늘 1큰술","고추장 1.5큰술","고춧가루 1큰술","국간장 1큰술","설탕 1/2큰술","된장 1/2큰술(선택)"],steps:["냄비에 물, 고추장, 고춧가루, 마늘, 국간장, 설탕, 된장을 넣고 잘 풀어요.","감자를 한입 크기로 썰어 넣고 센 불로 끓여요.","끓기 시작하면 중불로 줄여 10분 정도 끓여 감자를 익혀요.","스팸과 양파를 넣고 7~10분 더 보글보글 끓여요.","마지막 2~3분에 대파와 청양고추를 넣어요.","맛을 보고 싱거우면 소금이나 국간장을 아주 조금씩 추가해요."],tip:"스팸 자체가 짜기 때문에 처음부터 소금을 넣지 않는 게 핵심!"},
+{id:2,cat:"국·찌개",icon:"🥬",name:"칼칼한 콩나물국",time:"15분",level:"초보",desc:"콩나물 하나로 시원하고 칼칼하게.",ingredients:["콩나물 200g","물 700ml","대파 1/2대","다진 마늘 1/2큰술","국간장 1큰술","소금 1/2작은술 정도","멸치액젓 1/2큰술(선택)","고춧가루 1/2큰술","청양고추 1개(선택)"],steps:["콩나물을 2~3번 살살 씻어요.","냄비에 물 700ml와 콩나물을 넣고 센 불로 끓여요.","팔팔 끓으면 중불로 줄이고 마늘, 국간장, 액젓, 고춧가루를 넣어요.","5~7분 끓인 뒤 대파와 청양고추를 넣고 2~3분 더 끓여요.","먹어보고 싱거우면 소금을 조금씩 추가해요."],tip:"콩나물을 익히는 동안 뚜껑을 계속 열었다 닫았다 하지 않는 게 편해요."},
+{id:3,cat:"국·찌개",icon:"🍅",name:"스팸 김치찌개",time:"25분",level:"초보",desc:"김치와 스팸으로 만드는 든든한 2인분 찌개.",ingredients:["김치 200~250g","스팸 1캔(약 200g)","물 700ml","양파 1/2개","대파 1/2대","다진 마늘 1/2큰술","식용유 1큰술","고춧가루 1큰술","국간장 1큰술","설탕 1/2큰술","참치액젓 1/2큰술(선택)"],steps:["냄비에 식용유를 두르고 중불에서 김치를 2~3분 볶아요.","불을 중약불로 줄이고 고춧가루, 설탕, 마늘을 넣어 30초 정도만 볶아요.","물 700ml와 국간장을 넣고 센 불로 끓여요.","끓으면 스팸과 양파를 넣고 중불에서 10분 정도 끓여요.","마지막에 대파를 넣고 2~3분 더 끓여요.","간을 보고 부족할 때만 액젓이나 소금을 조금 넣어요."],tip:"김치가 아주 시면 설탕을 조금 넣고, 스팸이 짜므로 소금은 마지막에만!"},
+{id:4,cat:"반찬",icon:"🥗",name:"매콤 콩나물무침",time:"10분",level:"초보",desc:"아삭아삭해서 밥 한 공기가 순식간에 사라져요.",ingredients:["콩나물 200g","소금 1/2작은술","다진 마늘 1/2큰술","고춧가루 1/2큰술","참기름 1큰술","깨 1/2큰술","대파 조금"],steps:["콩나물을 깨끗이 씻어요.","끓는 물에 콩나물을 4~5분 삶아요.","체에 밭쳐 물기를 충분히 빼요.","2~3분 식힌 뒤 양념을 모두 넣어요.","손으로 살살 버무리고 간을 봐요."],tip:"콩나물국을 만들 때 일부를 건져내 무침으로 만들면 재료를 한 번에 활용할 수 있어요."},
+{id:5,cat:"한 끼",icon:"🍳",name:"간장 계란밥",time:"5분",level:"★",desc:"요리하기 싫은 날에도 가능한 가장 쉬운 한 끼.",ingredients:["밥 2공기","계란 2개","간장 1~1.5큰술","참기름 1큰술","식용유 조금","김가루(선택)","깨(선택)"],steps:["팬에 식용유를 조금 두르고 계란 2개를 원하는 정도로 익혀요.","따뜻한 밥을 그릇에 담아요.","계란을 올리고 간장을 1큰술부터 넣어요.","참기름을 둘러 비벼 먹어요.","싱거우면 간장을 조금 더 추가해요."],tip:"간장은 한꺼번에 많이 넣지 말고 1큰술부터 시작하세요."},
+{id:6,cat:"한 끼",icon:"🥫",name:"참치마요 덮밥",time:"10분",level:"초보",desc:"불을 거의 쓰지 않고도 만들 수 있는 든든한 메뉴.",ingredients:["밥 2공기","참치캔 1개","마요네즈 3큰술","간장 1큰술","설탕 1/2큰술","계란 2개","김가루","후추 조금"],steps:["참치캔의 기름이나 물을 빼요.","참치에 마요네즈 2큰술을 섞어요.","팬에서 계란 2개를 스크램블처럼 익혀요.","밥 위에 계란과 참치를 올려요.","간장과 설탕을 섞어 조금씩 뿌리고 마요네즈 1큰술과 김가루를 올려요."],tip:"참치는 짤 수 있으니 간장은 조금씩 넣으면서 조절하세요."},
+{id:7,cat:"한 끼",icon:"🍚",name:"김치볶음밥",time:"15분",level:"초보",desc:"김치만 있어도 맛을 내기 쉬운 대표 초보 메뉴.",ingredients:["밥 2공기","김치 150g","대파 1/2대","식용유 1.5큰술","고춧가루 1/2큰술","간장 1큰술","설탕 1/2큰술","계란 2개(선택)","참기름 1/2큰술"],steps:["김치를 잘게 썰어요.","팬에 식용유와 대파를 넣고 중불에서 볶아요.","김치, 고춧가루, 설탕을 넣고 2~3분 볶아요.","팬 한쪽에 간장을 넣어 살짝 끓인 뒤 김치와 섞어요.","밥을 넣고 주걱으로 잘 풀어가며 볶아요.","불을 끄고 참기름을 넣어요. 원하면 계란후라이를 올려요."],tip:"밥이 너무 뜨거우면 질어질 수 있어 한 김 식힌 밥도 좋아요."},
+{id:8,cat:"반찬",icon:"🥔",name:"간장 감자조림",time:"25분",level:"초보",desc:"감자 하나로 만드는 달달짭짤한 밥반찬.",ingredients:["감자 2개","물 250ml","간장 2큰술","설탕 1큰술","올리고당 1큰술(선택)","식용유 1큰술","참기름 1/2큰술","깨 조금"],steps:["감자를 한입 크기로 썰고 물에 한 번 헹궈 전분을 빼요.","팬에 감자와 식용유를 넣고 2~3분 볶아요.","물, 간장, 설탕을 넣고 끓여요.","중불에서 뚜껑을 살짝 덮고 10~15분 졸여요.","감자가 익고 양념이 자작해지면 올리고당을 넣어요.","불을 끄고 참기름과 깨를 넣어요."],tip:"감자가 너무 크면 익는 시간이 길어져요. 한입 크기로 비슷하게 썰면 편해요."},
+{id:9,cat:"반찬",icon:"🥚",name:"전자레인지 계란찜",time:"7분",level:"★",desc:"냄비 없이 폭신폭신하게 만드는 초간단 계란찜.",ingredients:["계란 3개","물 150ml","소금 1/3작은술","대파 조금","참기름 몇 방울"],steps:["계란 3개를 그릇에 깨고 물과 소금을 넣어 잘 풀어요.","대파를 넣어요.","전자레인지용 용기에 담고 랩이나 뚜껑을 살짝 덮어요.","700W 기준 2분 돌린 뒤 꺼내 한 번 저어요.","다시 1분씩 돌리면서 가운데까지 익었는지 확인해요.","참기름을 몇 방울 떨어뜨려요."],tip:"전자레인지 출력에 따라 시간이 달라요. 한 번에 오래 돌리지 말고 1분씩 확인하세요."},
+{id:10,cat:"한 끼",icon:"🍛",name:"초간단 카레",time:"30분",level:"초보",desc:"재료를 썰어 넣고 끓이면 끝나는 든든한 메뉴.",ingredients:["카레가루 2~3인분","돼지고기 또는 닭고기 150g","감자 1개","양파 1개","당근 1/2개","물 500~600ml","식용유 1큰술"],steps:["고기와 채소를 한입 크기로 썰어요.","냄비에 식용유를 두르고 고기를 2~3분 볶아요.","양파, 감자, 당근을 넣고 3분 정도 볶아요.","물을 넣고 끓여요.","끓으면 중불로 줄이고 채소가 익을 때까지 15분 정도 끓여요.","불을 약하게 줄이고 카레가루를 넣어 잘 풀어요. 3~5분 더 끓이면 완성."],tip:"카레가루는 불을 약하게 한 뒤 넣으면 뭉치지 않게 풀기 쉬워요."},
+{id:11,cat:"한 끼",icon:"🍜",name:"김치 어묵우동",time:"15분",level:"초보",desc:"쌀쌀한 날 후루룩 먹기 좋은 국물 한 끼.",ingredients:["우동면 2개","어묵 2~3장","김치 100g","대파 1/2대","물 700ml","국간장 1큰술","다진 마늘 1/2큰술","고춧가루 1/2큰술"],steps:["냄비에 물, 김치, 마늘, 국간장을 넣고 끓여요.","끓으면 어묵을 넣고 5분 정도 끓여요.","우동면을 넣고 면이 풀릴 때까지 끓여요.","고춧가루와 대파를 넣고 2분 더 끓여요.","간을 보고 국간장이나 소금으로 조절해요."],tip:"우동면은 너무 오래 끓이면 퍼지므로 마지막에 넣어요."},
+{id:12,cat:"메인",icon:"🥩",name:"간장 돼지불고기",time:"25분",level:"초보",desc:"달달짭짤해서 밥과 잘 어울리는 기본 고기반찬.",ingredients:["돼지고기 불고기용 300g","양파 1/2개","대파 1/2대","간장 3큰술","설탕 1큰술","다진 마늘 1큰술","맛술 1큰술(선택)","참기름 1큰술","후추 조금"],steps:["양념 재료를 모두 섞어요.","돼지고기에 양념을 넣고 10분 정도 두어요.","팬을 센 불로 달군 뒤 고기를 펼쳐 넣어요.","고기가 익기 시작하면 양파를 넣고 볶아요.","고기가 완전히 익고 양념이 자작해지면 대파를 넣어요.","불을 끄고 참기름을 넣어요."],tip:"고기를 팬에 너무 많이 겹쳐 넣지 않으면 물이 덜 생기고 맛있게 볶여요."},
+{id:13,cat:"초간단",icon:"🍳",name:"스팸 계란부침",time:"10분",level:"★",desc:"스팸에 계란옷만 입히면 끝!",ingredients:["스팸 1/2캔","계란 2개","식용유 1큰술","후추 조금"],steps:["스팸을 얇게 썰어요.","계란 2개를 그릇에 풀어요.","스팸을 계란물에 앞뒤로 묻혀요.","팬에 식용유를 두르고 중약불에서 앞뒤로 노릇하게 구워요.","키친타월에 잠깐 올려 기름을 빼요."],tip:"스팸이 이미 짜기 때문에 계란물에는 소금을 넣지 않아도 돼요."},
+{id:14,cat:"간식",icon:"🍠",name:"에어프라이어 고구마칩",time:"20분",level:"★",desc:"얇게 썰어 굽기만 하면 바삭한 고구마칩.",ingredients:["고구마 1개","식용유 1~2작은술","소금 한 꼬집"],steps:["고구마를 깨끗이 씻고 2~3mm로 얇게 썰어요.","찬물에 5~10분 담갔다가 키친타월로 물기를 완전히 닦아요.","식용유와 소금을 아주 조금 넣고 섞어요.","에어프라이어 바스켓에 겹치지 않게 한 겹으로 놓아요.","160℃에서 10분 돌리고 뒤집어요.","160℃에서 5분 더 돌린 뒤 상태를 보며 1~3분 추가해요.","꺼낸 뒤 5분 정도 식히면 더 바삭해져요."],tip:"고구마칩은 겹쳐 놓으면 눅눅해져요. 양이 많으면 나눠서 굽는 게 좋아요."},
+{id:15,cat:"국·찌개",icon:"🫘",name:"초보 된장찌개",time:"25분",level:"초보",desc:"된장 하나만 잘 풀어도 집밥 느낌이 나는 기본 찌개.",ingredients:["물 650ml","된장 2큰술","감자 1개","애호박 1/2개","양파 1/2개","두부 1/2모","다진 마늘 1/2큰술","대파 1/2대","고춧가루 1/2큰술(선택)"],steps:["물 650ml에 된장을 잘 풀고 끓여요.","감자와 양파를 넣고 8~10분 끓여요.","애호박과 다진 마늘을 넣고 5분 끓여요.","두부와 대파를 넣고 3~5분 더 끓여요.","원하면 고춧가루를 넣고 간을 봐요. 부족하면 된장을 아주 조금 추가해요."],tip:"된장은 제품마다 짠 정도가 달라서 처음부터 많이 넣지 말고 마지막에 간을 맞춰요."}
+];
+
+let active="전체";
+const fav=JSON.parse(localStorage.getItem("recipeFav")||"[]");
+
+function initFilters(){
+ const cats=["전체",...new Set(recipes.map(r=>r.cat))];
+ document.getElementById("filters").innerHTML=cats.map(c=>`<button class="chip ${c===active?"active":""}" onclick="setCat('${c}')">${c}</button>`).join("");
+}
+function setCat(c){active=c;initFilters();render()}
+function toggleFav(id,e){
+ e.stopPropagation();
+ const i=fav.indexOf(id);
+ if(i>=0)fav.splice(i,1); else fav.push(id);
+ localStorage.setItem("recipeFav",JSON.stringify(fav)); render();
+}
+function render(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const list=recipes.filter(r=>(active==="전체"||r.cat===active)&&(!q||(r.name+r.desc+r.ingredients.join(" ")).toLowerCase().includes(q)));
+ document.getElementById("count").textContent=`${list.length}개`;
+ document.getElementById("empty").style.display=list.length?"none":"block";
+ document.getElementById("grid").innerHTML=list.map(r=>`
+  <article class="card" onclick="openRecipe(${r.id})">
+    <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
+    <div class="icon">${r.icon}</div>
+    <h3>${r.name}</h3>
+    <div class="desc">${r.desc}</div>
+    <div class="meta"><span class="tag">👥 2인분</span><span class="tag">⏱ ${r.time}</span><span class="tag">난이도 ${r.level}</span></div>
+  </article>`).join("");
+}
+function openRecipe(id){
+ const r=recipes.find(x=>x.id===id);
+ document.getElementById("sheet").innerHTML=`
+  <button class="close" onclick="closeModal()">×</button>
+  <div class="detail-icon">${r.icon}</div>
+  <h2>${r.name}</h2><p class="detail-desc">${r.desc}</p>
+  <div class="info"><span>👥 2인분</span><span>⏱ ${r.time}</span><span>난이도 ${r.level}</span></div>
+  <h3>🛒 재료</h3>
+  <ul class="ingredients">${r.ingredients.map(x=>`<li>${x}</li>`).join("")}</ul>
+  <h3>👩‍🍳 만드는 법</h3>
+  <ol class="steps">${r.steps.map(x=>`<li>${x}</li>`).join("")}</ol>
+  <h3>💡 초보자 TIP</h3><div class="tip">${r.tip}</div>`;
+ document.getElementById("modal").classList.add("show");
+ document.body.style.overflow="hidden";
+}
+function closeModal(){document.getElementById("modal").classList.remove("show");document.body.style.overflow=""}
+document.getElementById("search").addEventListener("input",render);
+initFilters();render();
+</script>
+
+<div class="bottom-nav">
+  <button id="navHome" class="active" onclick="appNav('home')"><span class="navicon">🏠</span>홈</button>
+  <button id="navFav" onclick="appNav('fav')"><span class="navicon">♥</span>찜</button>
+  <button id="navCook" onclick="appNav('cook')"><span class="navicon">🥘</span>요리모드</button>
+</div>
+<div id="timerBox" class="timer-box">
+  <div class="timer-row">
+    <div><div style="font-size:12px;opacity:.7">요리 타이머</div><div id="timerTime" class="timer-time">05:00</div></div>
+    <div class="timer-actions">
+      <button onclick="timerToggle()" id="timerStart">시작</button>
+      <button onclick="timerReset()">초기화</button>
+      <button onclick="timerClose()">닫기</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="aiRecipePanel" class="ai-recipe-panel" onclick="if(event.target===this)closeAIRecipe()">
+  <div class="ai-recipe-card">
+    <h2>🤖 ChatGPT에게 레시피 만들기</h2>
+    <p class="ai-sub">냉장고 재료와 원하는 메뉴를 적으면 ChatGPT가 초보자용 레시피를 만들어줘요.</p>
+    <div class="ai-field">
+      <label>🥕 가지고 있는 재료</label>
+      <textarea id="aiIngredients" placeholder="예: 스팸, 김치, 두부, 계란, 대파"></textarea>
+    </div>
+    <div class="ai-field">
+      <label>🍳 원하는 요리 (선택)</label>
+      <input id="aiDish" placeholder="예: 찌개 / 덮밥 / 반찬 / 아무거나">
+    </div>
+    <div class="ai-field">
+      <label>👥 인분</label>
+      <select id="aiServings"><option value="1">1인분</option><option value="2" selected>2인분</option><option value="3">3인분</option></select>
+    </div>
+    <div class="ai-field">
+      <label>🌶️ 추가 요청 (선택)</label>
+      <input id="aiRequest" placeholder="예: 맵지 않게 / 초보자용 / 15분 안에">
+    </div>
+    <div class="ai-actions">
+      <button class="ai-secondary" onclick="closeAIRecipe()">닫기</button>
+      <button class="ai-primary" onclick="makeAIRecipePrompt()">🤖 ChatGPT로 만들기</button>
+    </div>
+    <div id="aiPromptBox" class="ai-prompt">
+      <div class="ai-help">아래 요청문을 복사한 뒤 ChatGPT에서 붙여넣으면 돼요. 지금 사용하는 무료 ChatGPT에서도 사용할 수 있어요.</div>
+      <textarea id="aiPromptText" readonly></textarea>
+      <button class="ai-copy" onclick="copyAIPrompt()">📋 요청문 복사하기</button>
+      <button class="ai-copy" onclick="openChatGPT()">💬 ChatGPT 열기</button>
+    </div>
+  </div>
+</div>
+
+
+<script id="chatgpt-link-script">
+function openAIRecipe(){
+  const p=document.getElementById('aiRecipePanel');
+  if(p){p.style.display='block';document.body.style.overflow='hidden';}
+}
+function closeAIRecipe(){
+  const p=document.getElementById('aiRecipePanel');
+  if(p){p.style.display='none';document.body.style.overflow='';}
+}
+function makeAIRecipePrompt(){
+  const ingredients=document.getElementById('aiIngredients').value.trim();
+  const dish=document.getElementById('aiDish').value.trim();
+  const servings=document.getElementById('aiServings').value;
+  const request=document.getElementById('aiRequest').value.trim();
+  if(!ingredients){alert('가지고 있는 재료를 먼저 적어줘! 😊');return;}
+  const prompt=`나는 초보자용 개인 레시피북을 만들고 있어.
+아래 조건으로 바로 따라 할 수 있는 레시피를 만들어줘.
+
+[재료]
+${ingredients}
+
+[원하는 요리]
+${dish||'재료에 가장 잘 맞는 요리'}
+
+[인분]
+${servings}인분
+
+[추가 요청]
+${request||'없음'}
+
+반드시 다음 형식으로 작성해줘.
+
+🍳 요리 이름
+👥 ${servings}인분
+⏱ 예상 조리시간
+⭐ 난이도
+
+[재료]
+- 재료명: 양
+
+[양념]
+- 양념명: 양
+
+[만드는 법]
+1. 초보자가 이해하기 쉽게 구체적으로 설명
+2. 불 세기와 대략적인 시간을 함께 표시
+3. 다음 단계로 넘어가는 기준을 설명
+4. 마지막에 간을 보고 조절하는 방법 설명
+
+[초보자 팁]
+실수하기 쉬운 부분 2~3개
+
+실제 ${servings}인분에 충분한 양으로 작성하고 계량은 g/ml/큰술/작은술/개 등으로 통일해줘.
+없는 재료를 꼭 사야 한다면 '추가 구매 재료'로 따로 표시해줘.
+너무 복잡한 조리법은 피하고 집에서 쉽게 만들 수 있게 해줘.`;
+  document.getElementById('aiPromptText').value=prompt;
+  document.getElementById('aiPromptBox').style.display='block';
+}
+async function copyAIPrompt(){
+  const el=document.getElementById('aiPromptText');
+  try{await navigator.clipboard.writeText(el.value);}
+  catch(e){el.select();document.execCommand('copy');}
+  alert('요청문을 복사했어! ChatGPT를 열어서 붙여넣으면 돼 😊');
+}
+function openChatGPT(){window.open('https://chatgpt.com/','_blank');}
+</script>
+
+
+<div id="pasteRecipePanel" class="ai-recipe-panel" onclick="if(event.target===this)closePasteRecipe()">
+  <div class="ai-recipe-card">
+    <h2>📥 ChatGPT 레시피 저장</h2>
+    <p class="ai-sub">ChatGPT에서 만든 레시피를 복사해서 붙여넣으면 이 레시피북에 저장할 수 있어요.</p>
+    <div class="ai-field">
+      <label>🍳 레시피 붙여넣기</label>
+      <textarea id="pasteRecipeText" style="min-height:280px" placeholder="ChatGPT에서 만든 레시피 전체를 복사해서 붙여넣어 주세요."></textarea>
+    </div>
+    <div class="ai-actions">
+      <button class="ai-secondary" onclick="closePasteRecipe()">닫기</button>
+      <button class="ai-primary" onclick="savePastedRecipe()">💾 내 레시피에 저장</button>
+    </div>
+    <div class="ai-help">저장한 레시피는 현재 사용하는 기기의 브라우저에 저장돼요.</div>
+  </div>
+</div>
+<button type="button" onclick="openPasteRecipe()" style="position:fixed;right:18px;bottom:145px;z-index:900;border:0;border-radius:999px;padding:13px 16px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.18);">📥 레시피 저장</button>
+
+<button type="button" onclick="openAIRecipe()" aria-label="AI 레시피" style="position:fixed;right:18px;bottom:86px;z-index:900;border:0;border-radius:999px;padding:13px 16px;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.18);">🤖 AI 레시피</button>
+
+<script id="paste-recipe-script">
+function openPasteRecipe(){const p=document.getElementById('pasteRecipePanel');if(p){p.style.display='block';document.body.style.overflow='hidden';}}
+function closePasteRecipe(){const p=document.getElementById('pasteRecipePanel');if(p){p.style.display='none';document.body.style.overflow='';}}
+function savePastedRecipe(){
+  const raw=document.getElementById('pasteRecipeText').value.trim();
+  if(!raw){alert('레시피를 붙여넣어 주세요 😊');return;}
+  const lines=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const titleLine=lines.find(x=>x.includes('요리 이름'))||lines[0];
+  const name=titleLine.replace(/^.*?[:：]\s*/,'').replace(/^🍳\s*/,'').trim()||'새 레시피';
+  const ingredients=[],steps=[]; let sec='';
+  lines.forEach(x=>{
+    if(/^\[재료\]|^🛒\s*재료/.test(x)){sec='i';return;}
+    if(/^\[양념\]|^양념/.test(x)){sec='i';return;}
+    if(/^\[만드는 법\]|^👩‍🍳\s*만드는 법/.test(x)){sec='s';return;}
+    if(/^\[초보자 팁\]|^💡/.test(x)){sec='';return;}
+    if(sec==='i'&&/^[-•*]\s*/.test(x))ingredients.push(x.replace(/^[-•*]\s*/,''));
+    if(sec==='s'&&/^\d+[.)]\s*/.test(x))steps.push(x.replace(/^\d+[.)]\s*/,''));
+  });
+  const custom=JSON.parse(localStorage.getItem('mujiCustomRecipes')||'[]');
+  custom.unshift({id:'custom_'+Date.now(),cat:'내 레시피',icon:'🍳',name,time:'시간 미정',level:'내 레시피',desc:'ChatGPT에서 저장한 레시피',
+    ingredients:ingredients.length?ingredients:[raw],steps:steps.length?steps:['원문을 참고해 주세요.'],tip:'ChatGPT에서 만든 레시피를 저장한 항목입니다.'});
+  localStorage.setItem('mujiCustomRecipes',JSON.stringify(custom));
+  if(typeof recipes!=='undefined') recipes.unshift(custom[0]);
+  alert('내 레시피에 저장했어! 😊'); closePasteRecipe(); if(typeof render==='function')render();
+}
+</script>
+
+</body>
+
+
+<script>
+if(typeof openRecipe==="function"){ window.__originalOpenRecipe=openRecipe; }
+</script>
+
+<script>
+let appView="home";
+let currentRecipeId=null;
+let timerSeconds=300, timerInterval=null;
+
+function showInstallTip(){
+  const el=document.getElementById("installTip");
+  el.style.display=el.style.display==="none"?"block":"none";
+}
+function appNav(view){
+  appView=view;
+  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
+  if(view==="home") document.getElementById("navHome").classList.add("active");
+  if(view==="fav") document.getElementById("navFav").classList.add("active");
+  if(view==="cook") document.getElementById("navCook").classList.add("active");
+
+  if(view==="home"){
+    active="전체"; initFilters(); render();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else if(view==="fav"){
+    const oldActive=active;
+    active="__FAV__";
+    const q=document.getElementById("search").value.trim().toLowerCase();
+    const list=recipes.filter(r=>fav.includes(r.id)&&(!q||(r.name+r.desc+r.ingredients.join(" ")).toLowerCase().includes(q)));
+    document.getElementById("count").textContent=`${list.length}개`;
+    document.getElementById("empty").style.display=list.length?"none":"block";
+    document.getElementById("grid").innerHTML=list.map(r=>`
+      <article class="card" onclick="openRecipe(${r.id})">
+        <button class="heart ${fav.includes(r.id)?"on":""}" onclick="toggleFav(${r.id},event)">${fav.includes(r.id)?"♥":"♡"}</button>
+        <div class="icon">${r.icon}</div><h3>${r.name}</h3><div class="desc">${r.desc}</div>
+        <div class="meta"><span class="tag">👥 2인분</span><span class="tag">⏱ ${r.time}</span><span class="tag">난이도 ${r.level}</span></div>
+      </article>`).join("");
+  }else if(view==="cook"){
+    if(currentRecipeId) openRecipe(currentRecipeId,true);
+    else {
+      alert("먼저 레시피를 하나 열어주세요!");
+      appNav("home");
+    }
+  }
+}
+function openRecipe(id,cookMode){
+  currentRecipeId=id;
+  if(typeof window.__originalOpenRecipe==="function") return window.__originalOpenRecipe(id);
+  const r=recipes.find(x=>x.id===id);
+  if(!r)return;
+  const sheet=document.getElementById("sheet");
+  if(!sheet)return;
+  sheet.style.display="flex";
+  sheet.innerHTML=`
+    <div class="sheet-inner">
+      <button onclick="closeRecipe()" style="float:right;border:0;background:#fff;font-size:24px">✕</button>
+      <div style="font-size:42px">${r.icon}</div>
+      <h2>${r.name}</h2>
+      <div class="meta"><span class="tag">👥 <span id="servingLabel-${r.id}">2인분</span></span><span class="tag">⏱ ${r.time}</span></div>
+      <div class="serving-control">
+        <div><b>🍚 몇 명이 먹나요?</b><div style="font-size:12px;color:#8b7c71;margin-top:3px">재료 양을 자동으로 계산해요</div></div>
+        <div class="serving-buttons">
+          <button onclick="changeServing(${r.id},-1)">−</button>
+          <div class="serving-count" id="servingCount-${r.id}">2인분</div>
+          <button onclick="changeServing(${r.id},1)">+</button>
+        </div>
+      </div>
+      <div class="cookbar"><button class="primary" onclick="startCook(${r.id})">🥘 요리모드 시작</button><button onclick="startTimerFromRecipe('${r.time}')">⏱ 타이머</button></div>
+      <div id="wakeStatus-${r.id}" class="wake-status">💡 요리모드를 시작하면 화면 자동잠금을 최대한 막아줘요.</div>
+      <h3>🛒 재료</h3><ul id="ingredients-${r.id}">${r.ingredients.map(x=>`<li>${x}</li>`).join("")}</ul>
+      <h3>👩‍🍳 조리순서</h3>
+      <div id="steps">${r.steps.map((s,i)=>`<div class="step" style="display:flex;gap:10px;align-items:flex-start;margin:12px 0;padding:12px;border:1px solid #eee1d7;border-radius:14px"><input class="step-check" type="checkbox" onchange="this.parentElement.classList.toggle('done',this.checked)"><div><h4 style="margin:0 0 5px">STEP ${i+1}</h4><div>${s}</div></div></div>`).join("")}</div>
+      <div style="margin-top:15px;padding:14px;border-radius:14px;background:#fff4e8"><b>💡 초보 TIP</b><br>${r.tip}</div>
+    </div>`;
+  const savedServing=Number(localStorage.getItem("serving_"+id)||2);
+  renderIngredients(id,savedServing);
+}
+function closeRecipe(){const s=document.getElementById("sheet");if(s)s.style.display="none";}
+let wakeLock=null;
+async function enableWakeLock(id){
+  const status=document.getElementById("wakeStatus-"+id);
+  if(!("wakeLock" in navigator)){
+    if(status) status.textContent="💡 이 브라우저에서는 화면 자동잠금 방지 기능을 지원하지 않아요.";
+    return;
+  }
+  try{
+    wakeLock=await navigator.wakeLock.request("screen");
+    if(status){status.textContent="🔆 요리모드 ON — 화면이 꺼지지 않도록 유지 중";status.classList.add("on");}
+    wakeLock.addEventListener("release",()=>{ if(status){status.textContent="💡 화면 유지가 종료됐어요. 요리모드를 다시 눌러주세요.";status.classList.remove("on");} });
+  }catch(e){
+    if(status) status.textContent="💡 화면 유지 권한을 사용할 수 없어요. 화면을 한 번 터치하면 다시 유지될 수 있어요.";
+  }
+}
+document.addEventListener("visibilitychange",async()=>{
+  if(document.visibilityState==="visible" && currentRecipeId && wakeLock===null) enableWakeLock(currentRecipeId);
+});
+function startCook(id){
+  currentRecipeId=id;
+  if(typeof window.__originalOpenRecipe==="function") window.__originalOpenRecipe(id);
+  setTimeout(()=>{
+    const serving=Number(localStorage.getItem("serving_"+id)||2);
+    renderIngredients(id,serving);
+    enableWakeLock(id);
+    document.getElementById("steps")?.scrollIntoView({behavior:"smooth",block:"start"});
+  },100);
+}
+
+function changeServing(id,delta){
+  const key="serving_"+id;
+  let serving=Number(localStorage.getItem(key)||2);
+  serving=Math.min(10,Math.max(1,serving+delta));
+  localStorage.setItem(key,String(serving));
+  renderIngredients(id,serving);
+}
+function parseAmount(text){
+  // Handles common forms such as 1/2, 1.5, 2~3, and 1캔/1개.
+  const m=text.match(/(\d+(?:\.\d+)?(?:\/\d+)?)(?:\s*~\s*(\d+(?:\.\d+)?(?:\/\d+)?))?/);
+  if(!m)return null;
+  const toNum=s=>s.includes("/")?s.split("/").reduce((a,b)=>a/Number(b),Number(s.split("/")[0])):Number(s);
+  const a=toNum(m[1]), b=m[2]?toNum(m[2]):null;
+  return {start:a,end:b,prefix:text.slice(0,m.index),suffix:text.slice(m.index+m[0].length)};
+}
+function fmt(n){
+  const fractions=[[0.25,"1/4"],[0.33,"1/3"],[0.5,"1/2"],[0.67,"2/3"],[0.75,"3/4"]];
+  for(const [v,s] of fractions) if(Math.abs(n-v)<0.04)return s;
+  return Number.isInteger(n)?String(n):String(Math.round(n*10)/10);
+}
+function renderIngredients(id,serving){
+  const r=recipes.find(x=>x.id===id); if(!r)return;
+  document.getElementById("servingCount-"+id).textContent=`${serving}인분`;
+  document.getElementById("servingLabel-"+id).textContent=`${serving}인분`;
+  const ul=document.getElementById("ingredients-"+id);
+  if(!ul)return;
+  ul.innerHTML=r.ingredients.map(text=>{
+    const p=parseAmount(text);
+    if(!p)return `<li>${text}</li>`;
+    const ratio=serving/2;
+    const a=p.start*ratio;
+    const b=p.end?p.end*ratio:null;
+    const amount=b?`${fmt(a)}~${fmt(b)}`:fmt(a);
+    return `<li>${p.prefix}${amount}${p.suffix}</li>`;
+  }).join("");
+}
+
+function timerRender(){
+  const m=String(Math.floor(timerSeconds/60)).padStart(2,"0"), s=String(timerSeconds%60).padStart(2,"0");
+  document.getElementById("timerTime").textContent=`${m}:${s}`;
+  document.getElementById("timerStart").textContent=timerInterval?"일시정지":"시작";
+}
+function timerToggle(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;timerRender();return;}
+  if(timerSeconds<=0)return;
+  timerInterval=setInterval(()=>{timerSeconds--;timerRender();if(timerSeconds<=0){clearInterval(timerInterval);timerInterval=null;navigator.vibrate?.([300,150,300]);alert("⏰ 타이머 끝!");}},1000);
+  timerRender();
+}
+function timerReset(){clearInterval(timerInterval);timerInterval=null;timerSeconds=300;timerRender();}
+function timerClose(){clearInterval(timerInterval);timerInterval=null;document.getElementById("timerBox").classList.remove("show");}
+function startTimerFromRecipe(time){
+  const n=parseInt(time)||5; timerSeconds=Math.min(Math.max(n*60,60),3600);
+  document.getElementById("timerBox").classList.add("show"); timerRender();
+}
+</script>
+
+</html>
