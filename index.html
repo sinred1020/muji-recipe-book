@@ -380,112 +380,126 @@ function openChatGPT(){window.open('https://chatgpt.com/','_blank');}
 function openPasteRecipe(){const p=document.getElementById('pasteRecipePanel');if(p){p.style.display='block';document.body.style.overflow='hidden';}}
 function closePasteRecipe(){const p=document.getElementById('pasteRecipePanel');if(p){p.style.display='none';document.body.style.overflow='';}}
 function savePastedRecipe(){
-  const raw=document.getElementById('pasteRecipeText').value.trim();
-  if(!raw){alert('레시피를 붙여넣어 주세요 😊');return;}
+  var box=document.getElementById('pasteRecipeText');
+  var raw=box ? box.value.trim() : '';
+  if(!raw){ alert('레시피를 붙여넣어 주세요 😊'); return; }
 
-  // ChatGPT에서 복사한 마크다운/이모지/줄바꿈을 먼저 정리
-  const cleanText=s=>String(s)
-    .replace(/[\u200B-\u200D\uFEFF]/g,'')
-    .replace(/\u00A0/g,' ')
-    .replace(/^\s*[•●▪◦*\-]+\s*/,'')
-    .replace(/^\s*\d+[.)]\s*/,'')
-    .replace(/^\*\*(.*?)\*\*$/,'$1')
-    .replace(/^__(.*?)__$/,'$1')
-    .replace(/\\(?=\s|$)/g,'')
-    .trim();
-
-  const lines=raw.split(/\r?\n/).map(cleanText).filter(Boolean);
-  const joined=lines.join('\n');
-
-  let name='';
-  const titleMatch=joined.match(/(?:요리\s*이름|레시피\s*이름|메뉴)\s*[:：]\s*(.+)/i);
-  if(titleMatch) name=cleanText(titleMatch[1]).replace(/^🍳\s*/,'');
-  if(!name){
-    const titleLine=lines.find(x=>/^#+\s*/.test(x)||/^🍳/.test(x));
-    if(titleLine) name=titleLine.replace(/^#+\s*/,'').replace(/^🍳\s*/,'').trim();
+  function clean(s){
+    return String(s)
+      .replace(/[\u200B-\u200D\uFEFF]/g,'')
+      .replace(/\u00A0/g,' ')
+      .replace(/^\s*[•●▪◦*\-]+\s*/,'')
+      .replace(/^\s*\d+[.)]\s*/,'')
+      .replace(/^\*\*(.*?)\*\*$/,'$1')
+      .replace(/^__(.*?)__$/,'$1')
+      .replace(/\\(?=\s|$)/g,'')
+      .trim();
   }
-  if(!name) name='새 레시피';
 
-  const servingMatch=joined.match(/(?:👥\s*)?(\d+)\s*인분/);
-  const serving=Math.max(1,parseInt(servingMatch?.[1]||'2',10));
-  const timeMatch=joined.match(/(?:⏱\s*)?(?:예상\s*)?(?:조리\s*)?(?:시간|소요시간)\s*[:：]?\s*(?:약\s*)?([^\n]+)/i);
-  const time=timeMatch?cleanText(timeMatch[1]):'시간 미정';
-  const levelMatch=joined.match(/(?:난이도|레벨)\s*[:：]?\s*(쉬움|보통|어려움|초급|중급|상급|[★☆]+)/i);
-  const level=levelMatch?cleanText(levelMatch[1]):'초보';
+  var lines=raw.split(/\r?\n/).map(clean).filter(function(x){return x;});
+  var text=lines.join('\n');
 
-  let section='';
-  const ingredients=[],steps=[],tips=[];
-  const heading=s=>cleanText(s).replace(/^\*+|\*+$/g,'').replace(/^#+\s*/,'').trim();
-  const isHeading=(s,words)=>words.some(w=>heading(s).replace(/[\[\]]/g,'').trim().toLowerCase()===w);
-
-  lines.forEach(line=>{
-    const h=heading(line).replace(/[\[\]]/g,'').trim().toLowerCase();
-    if(['재료','재료 준비','재료 및 양념','재료 목록','양념','양념장'].includes(h)){section='i';return;}
-    if(['만드는 법','만드는 방법','조리 순서','조리법','요리 과정'].includes(h)){section='s';return;}
-    if(['초보자 팁','초보 tip','팁','주의사항'].includes(h)){section='t';return;}
-
-    if(section==='i') ingredients.push(cleanText(line));
-    else if(section==='s') steps.push(cleanText(line));
-    else if(section==='t') tips.push(cleanText(line));
-  });
-
-  // 섹션 제목이 조금 다른 경우를 위한 보정
-  if(!ingredients.length){
-    const marker=lines.findIndex(x=>/\[?재료\]?/i.test(heading(x)));
-    if(marker>=0){
-      for(let i=marker+1;i<lines.length;i++){
-        if(/만드는\s*법|만드는\s*방법|조리\s*순서|조리법/i.test(heading(lines[i]))) break;
-        if(/^(인분|예상 조리시간|조리시간|소요시간|난이도)\s*[:：]?/i.test(lines[i])) continue;
-        ingredients.push(cleanText(lines[i]));
+  var name='';
+  var m=text.match(/(?:요리\s*이름|레시피\s*이름|메뉴)\s*[:：]\s*(.+)/i);
+  if(m) name=clean(m[1]).replace(/^🍳\s*/,'');
+  if(!name){
+    for(var a=0;a<lines.length;a++){
+      if(/^#+\s*/.test(lines[a]) || /^🍳/.test(lines[a])){
+        name=lines[a].replace(/^#+\s*/,'').replace(/^🍳\s*/,'').trim();
+        break;
       }
     }
   }
+  if(!name) name='새 레시피';
+
+  m=text.match(/(?:👥\s*)?(\d+)\s*인분/);
+  var serving=m ? parseInt(m[1],10) : 2;
+  if(!serving || serving<1) serving=2;
+
+  m=text.match(/(?:⏱\s*)?(?:예상\s*)?(?:조리\s*)?(?:시간|소요시간)\s*[:：]?\s*(?:약\s*)?([^\n]+)/i);
+  var time=m ? clean(m[1]) : '시간 미정';
+
+  m=text.match(/(?:난이도|레벨)\s*[:：]?\s*(쉬움|보통|어려움|초급|중급|상급|[★☆]+)/i);
+  var level=m ? clean(m[1]) : '초보';
+
+  var section='';
+  var ingredients=[], steps=[], tips=[];
+
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i];
+    var h=clean(line).replace(/^#+\s*/,'').replace(/^\[|\]$/g,'').replace(/^\*+|\*+$/g,'').trim().toLowerCase();
+
+    if(h==='재료' || h==='재료 준비' || h==='재료 및 양념' || h==='재료 목록' || h==='양념' || h==='양념장'){
+      section='i'; continue;
+    }
+    if(h==='만드는 법' || h==='만드는 방법' || h==='조리 순서' || h==='조리법' || h==='요리 과정'){
+      section='s'; continue;
+    }
+    if(h==='초보자 팁' || h==='초보 tip' || h==='팁' || h==='주의사항'){
+      section='t'; continue;
+    }
+
+    if(section==='i') ingredients.push(clean(line));
+    else if(section==='s') steps.push(clean(line));
+    else if(section==='t') tips.push(clean(line));
+  }
+
+  if(!ingredients.length){
+    var ri=lines.findIndex(function(x){return /재료/.test(x);});
+    if(ri>=0){
+      for(var j=ri+1;j<lines.length;j++){
+        if(/만드는\s*법|만드는\s*방법|조리\s*순서|조리법/.test(lines[j])) break;
+        if(!/^(인분|예상 조리시간|조리시간|소요시간|난이도)/i.test(lines[j])) ingredients.push(clean(lines[j]));
+      }
+    }
+  }
+
   if(!steps.length){
-    const marker=lines.findIndex(x=>/만드는\s*법|만드는\s*방법|조리\s*순서|조리법|요리\s*과정/i.test(heading(x)));
-    if(marker>=0){
-      for(let i=marker+1;i<lines.length;i++){
-        if(/초보자\s*팁|초보\s*TIP|주의사항|팁/i.test(heading(lines[i]))) break;
-        steps.push(cleanText(lines[i]));
+    var rs=lines.findIndex(function(x){return /만드는\s*법|만드는\s*방법|조리\s*순서|조리법|요리\s*과정/.test(x);});
+    if(rs>=0){
+      for(var k=rs+1;k<lines.length;k++){
+        if(/초보자\s*팁|초보\s*TIP|주의사항|팁/i.test(lines[k])) break;
+        steps.push(clean(lines[k]));
       }
     }
   }
 
   if(!ingredients.length || !steps.length){
-    alert('재료 또는 조리순서를 찾지 못했어요.\n\nChatGPT 레시피를 그대로 붙여넣으면 자동으로 정리되도록 수정했어요. 다시 한 번 붙여넣어 주세요 😊');
+    alert('재료 또는 조리순서를 찾지 못했어요.\n\n다시 붙여넣어 주세요 😊');
     return;
   }
 
-  let custom=[];
+  var custom=[];
   try{
-    custom=JSON.parse(localStorage.getItem('mujiCustomRecipes')||'[]');
+    custom=JSON.parse(localStorage.getItem('mujiCustomRecipes') || '[]');
     if(!Array.isArray(custom)) custom=[];
-  }catch(e){custom=[];}
+  }catch(e){ custom=[]; }
 
-  const item={
+  var item={
     id:'custom_'+Date.now(),
     cat:'내 레시피',
     icon:'🍳',
-    name:name.replace(/\\/g,'').trim(),
-    time:time.replace(/\\/g,'').trim(),
-    level,
+    name:clean(name).replace(/\\/g,''),
+    time:clean(time).replace(/\\/g,''),
+    level:level,
     desc:'내가 저장한 레시피',
     baseServings:serving,
-    ingredients,
-    steps,
-    tip:(tips.length?tips.join(' '):'재료의 양과 불 조절을 확인하면서 천천히 조리해 주세요.').replace(/\\/g,'')
+    ingredients:ingredients,
+    steps:steps,
+    tip:(tips.length ? tips.join(' ') : '재료의 양과 불 조절을 확인하면서 천천히 조리해 주세요.').replace(/\\/g,'')
   };
 
   custom.unshift(item);
   localStorage.setItem('mujiCustomRecipes',JSON.stringify(custom));
 
   if(typeof recipes!=='undefined'){
-    recipes=recipes.filter(r=>String(r.id)!==String(item.id));
+    recipes=recipes.filter(function(r){return String(r.id)!==String(item.id);});
     recipes.unshift(item);
   }
 
-  alert('무지의 레시피북 형식으로 저장했어! 😊');
   closePasteRecipe();
   if(typeof render==='function') render();
+  alert('무지의 레시피북 형식으로 저장했어! 😊');
 }</script>
 
 </body>
