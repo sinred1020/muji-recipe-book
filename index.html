@@ -230,7 +230,7 @@ function toggleFav(id,e){
 }
 function render(){
  const q=document.getElementById("search").value.trim().toLowerCase();
- const list=recipes.filter(r=>(active==="전체"||r.cat===active)&&(!q||(r.name+r.desc+r.ingredients.join(" ")).toLowerCase().includes(q)));
+ const list=recipes.filter(r=>(active==="전체"||r.cat===active)&&(!q||(r.name).toLowerCase().includes(q)));
  document.getElementById("count").textContent=`${list.length}개`;
  document.getElementById("empty").style.display=list.length?"none":"block";
  document.getElementById("grid").innerHTML=list.map(r=>`
@@ -557,7 +557,7 @@ function appNav(view){
     const oldActive=active;
     active="__FAV__";
     const q=document.getElementById("search").value.trim().toLowerCase();
-    const list=recipes.filter(r=>fav.includes(r.id)&&(!q||(r.name+r.desc+r.ingredients.join(" ")).toLowerCase().includes(q)));
+    const list=recipes.filter(r=>fav.includes(r.id)&&(!q||(r.name).toLowerCase().includes(q)));
     document.getElementById("count").textContent=`${list.length}개`;
     document.getElementById("empty").style.display=list.length?"none":"block";
     document.getElementById("grid").innerHTML=list.map(r=>`
