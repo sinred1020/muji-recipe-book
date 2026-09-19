@@ -811,10 +811,22 @@ window.savePastedRecipe = function(){
     recipes.unshift(item);
   }
 
+  // iPhone/iPad 홈 화면 앱에서도 확실히 보이도록 자체 저장 완료 토스트를 먼저 표시
+  var toast=document.getElementById('mujiSaveToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='mujiSaveToast';
+    toast.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#222;color:#fff;padding:14px 18px;border-radius:14px;font-size:15px;font-weight:700;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.22);text-align:center;min-width:230px;max-width:85%;';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML='✅ 저장됐어요!<br><span style="font-weight:500;font-size:13px;">「'+name+'」 레시피가 내 레시피에 저장됐어요.</span>';
+  toast.style.display='block';
+  clearTimeout(window.mujiSaveToastTimer);
+  window.mujiSaveToastTimer=setTimeout(function(){ toast.style.display='none'; },2500);
+
+  if(box) box.value='';
   closePasteRecipe();
   if(typeof render==='function') render();
-  alert('✅ 저장됐어요!\n\n「'+name+'」 레시피가 내 레시피에 저장되었습니다.\n같은 제목으로 다시 저장하면 기존 레시피가 새 내용으로 덮어써져요.');
-  if(box) box.value='';
 };
 </script>
 
