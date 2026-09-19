@@ -181,8 +181,33 @@ if(localStorage.getItem("mujiCustomRecipesReset_v1")!=="done"){
 }
 
 try {
-  const savedCustomRecipes = JSON.parse(localStorage.getItem("mujiCustomRecipes") || "[]");
+  var savedCustomRecipes = JSON.parse(localStorage.getItem("mujiCustomRecipes") || "[]");
   if (Array.isArray(savedCustomRecipes) && savedCustomRecipes.length) {
+    function normalizeSavedTitle(s){
+      return String(s || "")
+        .replace(/\\/g,"")
+        .replace(/^\s*[🍳📌]+\s*/,"")
+        .replace(/^#+\s*/,"")
+        .replace(/^\*+\s*/,"").replace(/\s*\*+$/,"")
+        .replace(/^_+\s*/,"").replace(/\s*_+$/,"")
+        .replace(/[\s\u00A0]+/g," ").trim();
+    }
+    function savedTitleKey(s){ return normalizeSavedTitle(s).toLowerCase(); }
+
+    var seenSavedTitles = {};
+    savedCustomRecipes = savedCustomRecipes.map(function(r){
+      r.name = normalizeSavedTitle(r.name);
+      if(r.time) r.time = normalizeSavedTitle(r.time);
+      if(r.tip) r.tip = normalizeSavedTitle(r.tip);
+      return r;
+    }).filter(function(r){
+      var k = savedTitleKey(r.name);
+      if(!k || seenSavedTitles[k]) return false;
+      seenSavedTitles[k] = true;
+      return true;
+    });
+
+    localStorage.setItem("mujiCustomRecipes", JSON.stringify(savedCustomRecipes));
     recipes.unshift(...savedCustomRecipes);
   }
 } catch (e) {
