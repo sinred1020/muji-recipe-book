@@ -696,17 +696,28 @@ function startTimerFromRecipe(time){
 function deleteCustomRecipe(id,event){
   if(event){ event.stopPropagation(); event.preventDefault(); }
   var r=recipes.find(function(x){return String(x.id)===String(id);});
-  if(!r || r.cat!=='내 레시피') return;
+  if(!r) return;
   var ok=confirm('「'+r.name+'」 레시피를 삭제할까요?');
   if(!ok) return;
-  var custom=[];
-  try{ custom=JSON.parse(localStorage.getItem('mujiCustomRecipes')||'[]'); }catch(e){ custom=[]; }
-  if(!Array.isArray(custom)) custom=[];
-  custom=custom.filter(function(x){return String(x.id)!==String(id);});
-  localStorage.setItem('mujiCustomRecipes',JSON.stringify(custom));
+
+  if(r.cat==='내 레시피'){
+    var custom=[];
+    try{ custom=JSON.parse(localStorage.getItem('mujiCustomRecipes')||'[]'); }catch(e){ custom=[]; }
+    if(!Array.isArray(custom)) custom=[];
+    custom=custom.filter(function(x){return String(x.id)!==String(id);});
+    localStorage.setItem('mujiCustomRecipes',JSON.stringify(custom));
+  }else{
+    var deleted=[];
+    try{ deleted=JSON.parse(localStorage.getItem('mujiDeletedRecipes')||'[]'); }catch(e){ deleted=[]; }
+    if(!Array.isArray(deleted)) deleted=[];
+    if(deleted.indexOf(String(id))===-1) deleted.push(String(id));
+    localStorage.setItem('mujiDeletedRecipes',JSON.stringify(deleted));
+  }
+
   recipes=recipes.filter(function(x){return String(x.id)!==String(id);});
   if(typeof closeRecipe==='function') closeRecipe();
   if(typeof render==='function') render();
+
   var toast=document.getElementById('mujiSaveToast');
   if(!toast){
     toast=document.createElement('div');
@@ -870,7 +881,7 @@ window.savePastedRecipe = function(){
       var titleEl=card.querySelector('h3');
       if(!titleEl) return;
       var name=titleEl.textContent.trim();
-      var r=recipes.find(function(x){return x.cat==='내 레시피' && x.name===name;});
+      var r=recipes.find(function(x){return x.name===name;});
       if(!r) return;
       var btn=document.createElement('button');
       btn.className='custom-delete-btn';
@@ -887,6 +898,21 @@ window.savePastedRecipe = function(){
   var obs=new MutationObserver(addDeleteButtons);
   obs.observe(document.getElementById('grid')||document.body,{childList:true,subtree:true});
   setTimeout(addDeleteButtons,300);
+})();
+</script>
+<script id="recipe-delete-filter">
+(function(){
+  var deleted=[];
+  try{ deleted=JSON.parse(localStorage.getItem('mujiDeletedRecipes')||'[]'); }catch(e){ deleted=[]; }
+  if(!Array.isArray(deleted)) deleted=[];
+  if(deleted.length && typeof recipes!=='undefined'){
+    recipes=recipes.filter(function(r){ return deleted.indexOf(String(r.id))===-1; });
+  }
+  window.restoreDeletedRecipes=function(){
+    if(!confirm('삭제한 기본 레시피를 모두 복원할까요?')) return;
+    localStorage.removeItem('mujiDeletedRecipes');
+    location.reload();
+  };
 })();
 </script>
 </html>
