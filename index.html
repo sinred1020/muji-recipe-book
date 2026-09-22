@@ -692,6 +692,35 @@ function startTimerFromRecipe(time){
 }
 </script>
 
+<script id="recipe-delete-feature">
+function deleteCustomRecipe(id,event){
+  if(event){ event.stopPropagation(); event.preventDefault(); }
+  var r=recipes.find(function(x){return String(x.id)===String(id);});
+  if(!r || r.cat!=='내 레시피') return;
+  var ok=confirm('「'+r.name+'」 레시피를 삭제할까요?');
+  if(!ok) return;
+  var custom=[];
+  try{ custom=JSON.parse(localStorage.getItem('mujiCustomRecipes')||'[]'); }catch(e){ custom=[]; }
+  if(!Array.isArray(custom)) custom=[];
+  custom=custom.filter(function(x){return String(x.id)!==String(id);});
+  localStorage.setItem('mujiCustomRecipes',JSON.stringify(custom));
+  recipes=recipes.filter(function(x){return String(x.id)!==String(id);});
+  if(typeof closeRecipe==='function') closeRecipe();
+  if(typeof render==='function') render();
+  var toast=document.getElementById('mujiSaveToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='mujiSaveToast';
+    toast.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#222;color:#fff;padding:14px 18px;border-radius:14px;font-size:15px;font-weight:700;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.22);text-align:center;min-width:230px;max-width:85%;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent='🗑️ 「'+r.name+'」 레시피가 삭제됐어요.';
+  toast.style.display='block';
+  clearTimeout(window.mujiSaveToastTimer);
+  window.mujiSaveToastTimer=setTimeout(function(){toast.style.display='none';},2200);
+}
+</script>
+
 <script id="paste-recipe-final-fix">
 window.savePastedRecipe = function(){
   var box=document.getElementById('pasteRecipeText');
