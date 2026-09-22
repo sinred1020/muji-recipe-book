@@ -859,4 +859,34 @@ window.savePastedRecipe = function(){
 };
 </script>
 
+<script id="recipe-delete-button-ui">
+(function(){
+  function addDeleteButtons(){
+    var grid=document.getElementById('grid');
+    if(!grid || typeof recipes==='undefined') return;
+    var cards=grid.querySelectorAll('.card');
+    cards.forEach(function(card){
+      if(card.querySelector('.custom-delete-btn')) return;
+      var titleEl=card.querySelector('h3');
+      if(!titleEl) return;
+      var name=titleEl.textContent.trim();
+      var r=recipes.find(function(x){return x.cat==='내 레시피' && x.name===name;});
+      if(!r) return;
+      var btn=document.createElement('button');
+      btn.className='custom-delete-btn';
+      btn.type='button';
+      btn.textContent='🗑️ 삭제';
+      btn.style.cssText='position:absolute;right:16px;bottom:16px;border:0;background:#f5ece4;color:#6b5548;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:800;z-index:2;cursor:pointer;';
+      btn.onclick=function(e){deleteCustomRecipe(r.id,e);};
+      card.appendChild(btn);
+    });
+  }
+  var style=document.createElement('style');
+  style.textContent='.custom-delete-btn:active{transform:scale(.96)}';
+  document.head.appendChild(style);
+  var obs=new MutationObserver(addDeleteButtons);
+  obs.observe(document.getElementById('grid')||document.body,{childList:true,subtree:true});
+  setTimeout(addDeleteButtons,300);
+})();
+</script>
 </html>
