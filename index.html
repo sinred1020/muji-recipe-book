@@ -242,22 +242,6 @@ function render(){
     <div class="meta"><span class="tag">👥 2인분</span><span class="tag">⏱ ${r.time}</span><span class="tag">난이도 ${r.level}</span></div>
   </article>`).join("");
 }
-function openRecipe(id){
- const r=recipes.find(x=>String(x.id)===String(id));
- if(!r){ alert("레시피를 불러오지 못했어요. 페이지를 새로고침해 주세요."); return; }
- document.getElementById("sheet").innerHTML=`
-  <button class="close" onclick="closeModal()">×</button>
-  <div class="detail-icon">${r.icon}</div>
-  <h2>${r.name}</h2><p class="detail-desc">${r.desc}</p>
-  <div class="info"><span>👥 2인분</span><span>⏱ ${r.time}</span><span>난이도 ${r.level}</span></div>
-  <h3>🛒 재료</h3>
-  <ul class="ingredients">${r.ingredients.map(x=>`<li>${x}</li>`).join("")}</ul>
-  <h3>👩‍🍳 만드는 법</h3>
-  <ol class="steps">${r.steps.map(x=>`<li>${x}</li>`).join("")}</ol>
-  <h3>💡 초보자 TIP</h3><div class="tip">${r.tip}</div>`;
- document.getElementById("modal").classList.add("show");
- document.body.style.overflow="hidden";
-}
 function closeModal(){document.getElementById("modal").classList.remove("show");document.body.style.overflow=""}
 document.getElementById("search").addEventListener("input",render);
 initFilters();render();
@@ -529,10 +513,6 @@ function savePastedRecipe(){
 
 </body>
 
-
-<script>
-if(typeof openRecipe==="function"){ window.__originalOpenRecipe=openRecipe; }
-</script>
 
 <script>
 let appView="home";
