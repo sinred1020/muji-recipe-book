@@ -576,7 +576,6 @@ function appNav(view){
 }
 function openRecipe(id,cookMode){
   currentRecipeId=id;
-  if(typeof window.__originalOpenRecipe==="function") return window.__originalOpenRecipe(id);
   const r=recipes.find(x=>String(x.id)===String(id));
   if(!r)return;
   const sheet=document.getElementById("sheet");
@@ -627,7 +626,7 @@ document.addEventListener("visibilitychange",async()=>{
 });
 function startCook(id){
   currentRecipeId=id;
-  if(typeof window.__originalOpenRecipe==="function") window.__originalOpenRecipe(id);
+  openRecipe(id,true);
   setTimeout(()=>{
     const serving=Number(localStorage.getItem("serving_"+id)||2);
     renderIngredients(id,serving);
