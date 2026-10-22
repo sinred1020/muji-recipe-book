@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="비엔나·프라하 여행">
+<meta name="theme-color" content="#f8f4ed">
+<title>비엔나·프라하 여행 노트</title>
+<style>
+:root{--bg:#f8f4ed;--paper:#fffdf9;--ink:#292b2a;--muted:#77766f;--line:#e9e1d6;--red:#a8483e;--gold:#b78b4b;--green:#54705b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}button,input,select{font:inherit}button{cursor:pointer}.hero{padding:28px 20px 22px;background:linear-gradient(145deg,#f2e5d7,#faf5ed 70%);border-bottom:1px solid var(--line)}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--red);font-weight:800}.hero h1{font-family:Georgia,serif;font-size:30px;line-height:1.15;margin:9px 0}.hero p{margin:0;color:#6e6257;font-size:13px;line-height:1.6}.city-switch{display:flex;gap:8px;margin-top:18px}.city-switch button,.chip{border:1px solid #d8c9b7;background:#fffaf3;color:#574d43;border-radius:999px;padding:9px 14px;font-weight:700;font-size:13px}.city-switch button.active{background:var(--ink);color:white;border-color:var(--ink)}main{max-width:760px;margin:auto;padding:16px}.search-wrap{position:sticky;top:0;z-index:5;padding:8px 0 12px;background:var(--bg)}.search{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:14px 15px;outline:none}.filters{display:flex;gap:7px;overflow:auto;padding:3px 0 10px;scrollbar-width:none}.filters button{white-space:nowrap}.chip.active{background:#ead9c6;border-color:#d4b99c;color:#5c372e}.section-head{display:flex;align-items:end;justify-content:space-between;margin:8px 0 12px}.section-head h2{font-size:18px;margin:0}.count{font-size:12px;color:var(--muted)}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 12px;box-shadow:0 3px 12px #40301a08}.card-top{display:flex;gap:12px;align-items:flex-start}.emoji{width:42px;height:42px;display:grid;place-items:center;background:#f4eadf;border-radius:13px;font-size:22px;flex-shrink:0}.card h3{font-size:17px;line-height:1.3;margin:1px 0 5px}.sub{font-size:12px;color:var(--muted);line-height:1.45}.tags{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}.tag{font-size:11px;border-radius:6px;padding:4px 7px;background:#f1e8dc;color:#6b5545}.tag.star{background:#f8e7b7;color:#6e4d0b}.tag.visited{background:#dfece0;color:#315c3c}.note{font-size:13px;line-height:1.65;margin:10px 0 12px;white-space:pre-line}.meta{border-top:1px solid var(--line);padding-top:10px;font-size:12px;color:#625e57;line-height:1.65}.meta strong{color:#393732}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.actions a,.actions button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:white;color:var(--ink);font-size:12px;font-weight:750}.actions a.map{background:var(--red);border-color:var(--red);color:white}.actions button.fav.active{background:#fae7e4;color:#9e332e;border-color:#e7b9b3}.empty{text-align:center;padding:40px 12px;color:var(--muted)}.bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;justify-content:center;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fffdf9ed;border-top:1px solid var(--line);backdrop-filter:blur(14px)}.bottom button{border:0;background:transparent;padding:8px 14px;border-radius:12px;color:#777;font-size:12px;font-weight:700}.bottom button.active{background:#f1e5d8;color:#653e32}.disclaimer{font-size:11px;color:#8a8177;line-height:1.6;margin:18px 4px}.section-label{font-size:11px;letter-spacing:1.2px;color:var(--red);font-weight:800;margin:18px 2px 8px}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="eyebrow">TRAVEL NOTES · EUROPE</div>
+<h1>Vienna <span style="color:#b78b4b">&</span> Prague</h1>
+<p>직접 다녀온 후기와 저장해 둔 추천 장소를 모은 여행 노트 ✈️<br>장소를 누르고 구글맵으로 위치·길찾기·최신 영업정보를 확인해요.</p>
+<div class="city-switch"><button class="active" data-city="비엔나">🇦🇹 비엔나</button><button data-city="프라하">🇨🇿 프라하</button><button data-city="체스키크룸로프">🏘️ 체스키</button></div>
+</header>
+<main>
+<div class="search-wrap">
+<input class="search" id="search" placeholder="🔎 장소 이름이나 메뉴 검색" autocomplete="off">
+<div class="filters" id="filters"></div>
+</div>
+<div class="section-head"><h2 id="listTitle">비엔나 추천 장소</h2><span class="count" id="count"></span></div>
+<div id="cards"></div>
+<p class="disclaimer">※ 영업시간·휴무·예약 정책은 시즌, 공휴일, 임시 휴업에 따라 바뀔 수 있어요. 카드에 기재된 공식 안내와 별도로, 방문 당일 Google Maps 또는 공식 홈페이지에서 꼭 재확인해 주세요. 원문에 없던 세부 정보는 임의로 만들지 않고 ‘지도에서 확인’으로 표시했어요.</p>
+</main>
+<nav class="bottom"><button class="active" data-view="all">📍 전체</button><button data-view="favorites">❤️ 찜한 곳</button><button data-view="visited">☑️ 가본 곳</button></nav>
+<script>
+const places = [
+{city:"비엔나",cat:"음식점",name:"Plachutta Wollzeile",emoji:"🥩",address:"Wollzeile 38, 1010 Wien, Austria",status:"방문함 · 재방문 추천",star:true,visited:true,note:"타펠슈피츠 2인 주문 추천. 빵에 고기를 올리고 두 종류의 소스와 먹으면 맛있음. 뼈 속 골수도 빵에 발라 먹기. 야채 추가는 선택. 굴라쉬는 호불호가 갈릴 수 있음.",menu:"타펠슈피츠",hours:"매일 11:30–23:30 (공식 사이트 기준)",closed:"별도 휴무 안내 없음",url:"https://www.plachutta.at/en/restaurant/wollzeile/"},
+{city:"비엔나",cat:"음식점",name:"Schnitzel One",emoji:"🍖",address:"Neuer Markt 8A, 1010 Wien, Austria",status:"방문함 · 슈니첼 추천",star:true,visited:true,note:"2인 기준 Quattro Schnitzel Mix(4가지 고기)와 양송이 튀김, 맥주 추천. 돼지·소·닭 등 고기를 골라 먹거나 믹스 메뉴를 주문할 수 있음.",menu:"Quattro Schnitzel Mix, 양송이 튀김",hours:"매일 11:00–22:00 (공식 사이트 기준)",closed:"별도 휴무 안내 없음",url:"https://www.schnitzelone.at/"},
+{city:"비엔나",cat:"음식점",name:"Huth Gastwirtschaft",emoji:"🍽️",address:"Schellinggasse 5, 1010 Wien, Austria",status:"가보고 싶은 곳",star:true,note:"타펠슈피츠 등 비엔나 전통요리. 예전에 마감시간 때문에 방문하지 못해 다음 여행 때 가보고 싶은 곳.",menu:"비엔나 전통요리",hours:"매일 12:00–23:00, 주방은 22:00까지 (공식 사이트 기준)",closed:"별도 휴무 안내 없음",url:"https://www.huth-gastwirtschaft.at/"},
+{city:"비엔나",cat:"음식점",name:"Beisl in der Sigmundsgasse",emoji:"🥘",address:"Sigmundsgasse 12, 1070 Wien, Austria",status:"예전 방문 · 이번엔 휴무",star:true,note:"오스트리아 가정식. 커틀릿을 먹었는데 전반적으로 정갈하고 편안한 분위기. 위치가 중심지에서 조금 떨어져 있어 동선 고려.",menu:"커틀릿, 오스트리아 가정식"},
+{city:"비엔나",cat:"음식점",name:"Salm Bräu",emoji:"🍖",address:"Rennweg 8, 1030 Wien, Austria",status:"방문함",note:"벨베데레 궁전 근처. 립은 1인분으로 주문하고 다른 메뉴를 곁들이는 것을 추천. 슈니첼·굴라쉬 등 다양하고 맥주 샘플러와 야외 좌석이 있음. 직원이 친절했음.",menu:"1인 립, 맥주 샘플러"},
+{city:"비엔나",cat:"음식점",name:"Mother & the bull",emoji:"🍔",address:"Fleischmarkt 11, 1010 Wien, Austria",status:"방문함",note:"스테이크와 햄버거가 먹고 싶을 때 괜찮은 곳.",menu:"스테이크, 햄버거"},
+{city:"비엔나",cat:"음식점",name:"Ribs of Vienna",emoji:"🍖",address:"Weihburggasse 22, 1010 Wien, Austria",status:"예전 여행에서 방문",note:"스페어립 전문. 한국인 입맛에 잘 맞는 립과 가성비가 장점. 예약 추천, Google을 통한 예약 안내가 원문에 기록되어 있음.",menu:"스페어립"},
+{city:"비엔나",cat:"음식점",name:"Griechenbeisl",emoji:"🏛️",address:"Fleischmarkt 11, 1010 Wien, Austria",status:"미방문 · 유명 맛집",note:"550년 이상 역사를 가진 곳으로 유명 예술가들의 사인이 있는 역사적인 분위기가 특징. 중심거리에서 조금 떨어져 있음.",menu:"전통 오스트리아 요리"},
+{city:"비엔나",cat:"음식점",name:"Restaurant Al Borgo",emoji:"🍝",address:"An der Hülben 1, 1010 Wien, Austria",status:"방문함",note:"분위기 좋은 이탈리아 레스토랑. 거래처와 방문했고 파스타 맛이 좋았음.",menu:"파스타, 해산물"},
+{city:"비엔나",cat:"음식점",name:"Pürstner",emoji:"🍲",address:"Riemergasse 10, 1010 Wien, Austria",status:"방문함",note:"전통 비엔나식 Gasthaus. 슈니첼이 유명하지만 원문 작성자는 Schnitzel One을 더 추천.",menu:"Wiener Schnitzel"},
+{city:"비엔나",cat:"음식점",name:"1516 Brewing Company",emoji:"🍺",address:"Schwarzenbergstraße 2, 1010 Wien, Austria",status:"미방문",note:"양조장 주점. 맥주와 립 등 식사 메뉴가 있어 방문해 보고 싶은 곳.",menu:"맥주, 립"},
+{city:"비엔나",cat:"간식",name:"Bitzinger Würstelstand",emoji:"🌭",address:"Albertinaplatz 1, 1010 Wien, Austria",status:"방문함 · 간식 추천",note:"알베르티나 미술관과 오페라 극장 근처 핫도그 가판대. Bosna는 고수·양파·머스터드·카레가루가 들어가 고수 호불호가 강하면 비추천. 핫도그 형태로 주문하는 것을 추천.",menu:"핫도그, Bosna"},
+{city:"비엔나",cat:"펍·바",name:"Golser Bier & Wein Bar",emoji:"🍷",address:"Riemergasse 4, 1010 Wien, Austria",status:"미방문",note:"Gols 지역 맥주와 와인, 치즈·햄 등 안주. 저녁 식사 후 2차로 가볍게 들르기 좋은 곳.",menu:"현지 맥주, 와인"},
+{city:"비엔나",cat:"펍·바",name:"Kolar Beisl",emoji:"🍺",address:"Kleeblattgasse 6, 1010 Wien, Austria",status:"미방문",note:"호프 스타일의 생맥주집.",menu:"생맥주"},
+{city:"비엔나",cat:"펍·바",name:"Bockshorn Irish Pub",emoji:"🍺",address:"Naglergasse 24, 1010 Wien, Austria",status:"미방문",note:"아이리시 펍. 기네스 생맥주를 마시고 싶을 때.",menu:"기네스"},
+{city:"비엔나",cat:"펍·바",name:"Vinum 1010",emoji:"🍷",address:"Krugerstraße 10/Top 3, 1010 Wien, Austria",status:"미방문",note:"와인바. 호이리게를 방문한다면 함께 고려해 볼 곳.",menu:"와인"},
+{city:"비엔나",cat:"카페",name:"Café Sacher",emoji:"🍰",address:"Philharmoniker Str. 4, 1010 Wien, Austria",status:"방문 추천",star:true,note:"호텔 자허 안에 있는 카페. 원조 자허토르테와 멜란지 커피, 자허토르테 칵테일 추천. 대기할 수 있지만 유명한 원조 카페를 경험하는 의미가 있음.",menu:"자허토르테, 멜란지",hours:"매일 07:00–23:00 (공식 사이트 기준)",closed:"매일 영업 안내",url:"https://www.sacher.com/en/restaurants/cafe-sacher-wien/"},
+{city:"비엔나",cat:"카페",name:"Café Central",emoji:"🎹",address:"Herrengasse 14, 1010 Wien, Austria",status:"방문 전 영업 재개 확인 필수",star:true,note:"분위기가 아름답고 피아노 연주와 커피·디저트가 유명. 원문에도 임시 휴업 가능성이 기록되어 있음.",menu:"멜란지 커피, 디저트",hours:"주의: 2026-03-16부터 리노베이션 휴업 공지. 재개장 여부 확인 필요",closed:"휴업 공지 확인 필수",url:"https://cafecentral.wien/en/home/"},
+{city:"비엔나",cat:"카페",name:"Café Demel",emoji:"🍰",address:"Kohlmarkt 14, 1010 Wien, Austria",status:"추천",note:"자허토르테와 케이크로 유명한 전통 패스트리 카페. 예약은 받지 않는다고 공식 사이트에 안내되어 있음.",menu:"자허토르테, 케이크",hours:"매일 10:00–19:00 (공식 사이트 기준)",closed:"매일 영업 안내",url:"https://www.demel.com/en/pages/cafe"},
+{city:"비엔나",cat:"카페",name:"Café Landtmann",emoji:"☕",address:"Universitätsring 4, 1010 Wien, Austria",status:"추천",note:"전통 비엔나 카페.",menu:"비엔나 커피, 디저트"},
+{city:"비엔나",cat:"관광지",name:"슈테판 대성당 · St. Stephen’s Cathedral",emoji:"⛪",address:"Stephansplatz 3, 1010 Wien, Austria",status:"꼭 가보기",star:true,note:"비엔나 대표 성당. 내부 관람과 유료 전망대에서 지붕 및 시내 전망을 즐길 수 있음.",menu:"성당 내부, 전망대"},
+{city:"비엔나",cat:"관광지",name:"호프부르크 왕궁 · Hofburg",emoji:"🏰",address:"Hofburg, 1010 Wien, Austria",status:"추천",note:"합스부르크 왕가의 겨울 궁전. 원문은 외관 구경 추천."},
+{city:"비엔나",cat:"관광지",name:"성 페터 성당 · St. Peter’s Church",emoji:"⛪",address:"Petersplatz 1, 1010 Wien, Austria",status:"추천",note:"아름다운 바로크 양식의 성당. 외관을 구경하기 좋은 곳."},
+{city:"비엔나",cat:"관광지",name:"미술사 박물관 · Kunsthistorisches Museum",emoji:"🖼️",address:"Maria-Theresien-Platz, 1010 Wien, Austria",status:"강력 추천",star:true,note:"브뤼헐의 유명 작품 등을 소장. 비엔나 미술관 중 무난하게 추천하는 곳. 맞은편 자연사 박물관과 함께 보기 좋음."},
+{city:"비엔나",cat:"관광지",name:"비엔나 국립오페라극장",emoji:"🎭",address:"Opernring 2, 1010 Wien, Austria",status:"추천",note:"건축물을 감상하거나 일정이 맞으면 오페라 관람도 추천."},
+{city:"비엔나",cat:"관광지",name:"알베르티나 · Albertina",emoji:"🌃",address:"Albertinaplatz 1, 1010 Wien, Austria",status:"야경 포토존 추천",star:true,note:"미술관·전시관. 내부 관람을 하지 않더라도 에스컬레이터를 올라가면 오페라 야경을 배경으로 사진을 찍기 좋음. 영화 비포 선라이즈 배경지로도 유명."},
+{city:"비엔나",cat:"관광지",name:"모차르트 아파트 · Mozarthaus",emoji:"🎼",address:"Domgasse 5, 1010 Wien, Austria",status:"추천",note:"모차르트의 옛 거주지. 원문에서는 투어를 추천."},
+{city:"비엔나",cat:"관광지",name:"시립공원 · Stadtpark",emoji:"🌳",address:"Stadtpark, 1030 Wien, Austria",status:"산책 추천",note:"피크닉하기 좋고 모차르트 등 유명 인물 동상을 구경할 수 있음."},
+{city:"비엔나",cat:"관광지",name:"레오폴트 미술관 · Leopold Museum",emoji:"🖼️",address:"Museumsplatz 1, 1070 Wien, Austria",status:"미술관 하나만 간다면 추천",star:true,note:"MuseumsQuartier에 위치. 에곤 실레 작품을 많이 볼 수 있어 시간이 짧을 때 고려할 만함."},
+{city:"비엔나",cat:"관광지",name:"비엔나 시청 · Rathaus",emoji:"🏛️",address:"Friedrich-Schmidt-Platz 1, 1010 Wien, Austria",status:"추천",note:"고딕 양식의 웅장한 시청 건물."},
+{city:"비엔나",cat:"관광지",name:"오스트리아 국회의사당",emoji:"🏛️",address:"Dr.-Karl-Renner-Ring 3, 1017 Wien, Austria",status:"추천",note:"그리스 신전 양식의 건축물."},
+{city:"비엔나",cat:"관광지",name:"법무부 · Justizpalast",emoji:"⚖️",address:"Schmerlingplatz 10, 1010 Wien, Austria",status:"무료 관람 정보 확인",star:true,note:"원문 메모: 평일 09:30–15:30, 시간당 최대 25명 무료 입장 가능하다고 기록되어 있음. 법원 운영·보안 사정에 따라 달라질 수 있으니 방문 전 공식 정보 확인. 꼭대기 카페 전망도 추천."},
+{city:"비엔나",cat:"관광지",name:"쇤브룬 궁전 · Schönbrunn Palace",emoji:"👑",address:"Schönbrunner Schloßstraße 47, 1130 Wien, Austria",status:"강력 추천 · 티켓 사전 확인",star:true,note:"합스부르크 왕가의 여름 궁전과 정원. 원문 작성자는 궁전 전체 방을 볼 수 있는 Palace Ticket을 추천했고, 관람 후 뒤쪽 정원을 지나 글로리에테까지 걸어가는 코스를 추천. 입장권 종류와 시간 지정 예매를 미리 확인."},
+{city:"비엔나",cat:"관광지",name:"벨베데레 궁전 · Belvedere",emoji:"🌷",address:"Prinz-Eugen-Straße 27, 1030 Wien, Austria",status:"강력 추천",star:true,note:"클림트의 <키스>를 소장한 미술관. 궁전과 정원도 아름다워 방문 추천."},
+{city:"비엔나",cat:"관광지",name:"칼렌베르크 전망대 · Kahlenberg",emoji:"🌄",address:"Am Kahlenberg, 1190 Wien, Austria",status:"와인농장과 묶기",note:"비엔나 근교 전망대. 와인농장·호이리게 방문과 묶어 다니기 좋음."},
+{city:"비엔나",cat:"음식점",name:"Organic viticulture Obermann",emoji:"🍇",address:"Vienna, Austria",status:"근교 후보 · 위치 확인",note:"원문에서 추천한 와인농장 식당. 방문 전 정확한 위치·영업일을 지도에서 확인."},
+{city:"비엔나",cat:"음식점",name:"Müllers Heuriger & Weingut",emoji:"🍷",address:"Vienna, Austria",status:"근교 후보 · 위치 확인",note:"와이너리에서 직접 만든 와인과 현지 음식을 즐기는 호이리게 후보. 9~10월 여행이라면 발효 초기의 Sturm도 원문에서 추천. 병은 세워서 보관."},
+{city:"비엔나",cat:"관광지",name:"빈 프라터 · Prater",emoji:"🎡",address:"Prater, 1020 Wien, Austria",status:"추천",note:"대관람차가 있는 유명 놀이공원."},
+{city:"비엔나",cat:"관광지",name:"도나우타워 · Donauturm",emoji:"🗼",address:"Donauturmplatz 1, 1220 Wien, Austria",status:"시간이 있으면",note:"시간이 여유로울 때 들러볼 전망 명소."},
+{city:"프라하",cat:"음식점",name:"U Pinkasů",emoji:"🍺",address:"Jungmannovo náměstí 16, 110 00 Praha 1, Czechia",status:"직접 찾은 맛집 · 맥주 추천",star:true,visited:true,note:"맥주만 마셨는데 탱크에서 직접 뽑아 신선도가 좋았음. 다크보다 일반 노란 맥주를 추천. 원문에는 현금만 받는다고 기록되어 있으나 결제 정책은 방문 전 확인. 지하에 역사적인 포토존이 있음.",menu:"필스너 우르켈",hours:"매일 10:00–22:30 (Prague City Tourism 기준)",closed:"매일 영업 안내",url:"https://www.upinkasu.com/"},
+{city:"프라하",cat:"음식점",name:"Naše maso",emoji:"🍔",address:"Dlouhá 39, 110 00 Praha 1, Czechia",status:"버거 강력 추천",star:true,visited:true,note:"버거가 특히 담백하고 맛있었다는 후기. 샌드위치도 괜찮았고 맥주는 컵을 받아 셀프로 따르는 방식. 패티 식감이 타르타르처럼 느껴질 수 있다는 메모.",menu:"일반 버거, 샌드위치"},
+{city:"프라하",cat:"음식점",name:"Next Door by Imperial",emoji:"🍷",address:"Zlatnická 3, 110 00 Praha 1, Czechia",status:"예약 방문",note:"궁전 같은 인테리어. 따뜻하게 낸 소머리 카르파초 스타일 전채가 인상적이었다는 후기. 멧돼지·토끼 신장 등 다양한 식재료를 사용해 새로운 음식을 경험하고 싶을 때.",menu:"카르파초, 이색 육류 요리"},
+{city:"프라하",cat:"간식",name:"뜨르들로 · Trdelník",emoji:"🍦",address:"Old Town, Prague, Czechia",status:"간식 추천",note:"굴뚝빵은 하나를 나눠 먹는 것을 추천. 초코 아이스크림은 맛이 강할 수 있어 바닐라나 피스타치오를 추천."},
+{city:"프라하",cat:"음식점",name:"Kuchyň",emoji:"🍖",address:"Hradčanské náměstí 186/1, 118 00 Praha 1, Czechia",status:"강력 추천",star:true,note:"가격대는 있지만 프라하성 관람 후 가기 좋음. 11:30 오픈 직후 야외 좋은 자리를 노려볼 만함. 비프 타르타르와 굴라쉬 추천. 야외 자리는 햇볕과 합석 여부 고려.",menu:"비프 타르타르, 굴라쉬, 레드와인"},
+{city:"프라하",cat:"음식점",name:"Kantýna",emoji:"🥩",address:"Politických vězňů 5, 110 00 Praha 1, Czechia",status:"고기 좋아하면 추천",note:"정육식당 같은 방식. 입구에서 머뭇거리기보다 안쪽으로 들어가 주문 종이를 받고, 고기·음료 코너에서 주문하는 방식이라는 메모. 티본 스테이크로 유명하다고 들었지만 원문 작성자는 먹어보지 않음.",menu:"티본 스테이크, 소시지, 카르파초, 비프 타르타르"},
+{city:"프라하",cat:"음식점",name:"Pilsnerka Národní",emoji:"🍺",address:"Národní, Praha, Czechia",status:"미방문 · 후보",note:"꼴레뇨, 치킨윙, 비프 타르타르와 맥주가 추천 메뉴. 재즈바 레두타와 묶어 가기 좋다는 메모.",menu:"꼴레뇨, 치킨윙, 비프 타르타르"},
+{city:"프라하",cat:"음식점",name:"Pasta Fresca",emoji:"🍝",address:"Celetná  pasta fresca, Praha 1, Czechia",status:"미방문 · 후보",note:"시금치 파스타와 알리오올리오 추천."},
+{city:"프라하",cat:"뷰·바",name:"Hotel U Prince Rooftop",emoji:"🌇",address:"Staroměstské náměstí 29, 110 00 Praha 1, Czechia",status:"미방문 · 전망 추천",note:"루프탑에서 구시가 광장을 내려다볼 수 있음."},
+{city:"프라하",cat:"음식점",name:"U Fleků",emoji:"🍻",address:"Křemencova 11, 110 00 Praha 1, Czechia",status:"미방문 · 후보",note:"분위기가 괜찮고 때때로 라이브 연주가 있음. 굴라쉬와 꼴레뇨 추천.",menu:"굴라쉬, 꼴레뇨"},
+{city:"프라하",cat:"펍·바",name:"Dva Kohouti",emoji:"🍺",address:"Sokolovská 81/55, 186 00 Praha 8, Czechia",status:"미방문 · 맥주 후보",note:"양조장. IPA를 추천하는 메모."},
+{city:"프라하",cat:"음식점",name:"Nam Vietnam Kitchen",emoji:"🍜",address:"Prague, Czechia",status:"미방문 · 후보",note:"쌀국수 맛집으로 저장해 둔 곳."},
+{city:"프라하",cat:"음식점",name:"Hoxton Burger",emoji:"🍔",address:"Prague, Czechia",status:"미방문 · 후보",note:"치즈가 듬뿍 흘러내리는 치즈 추가 버거 추천."},
+{city:"프라하",cat:"시장",name:"Farmářské tržiště · Saturday Market",emoji:"🧺",address:"Prague, Czechia",status:"토요일 오전에만 고려",note:"치즈버거와 바질 토스트 추천(바질 토스트는 현금만 받는다는 메모). 원석 장신구 구경도 가능. 토요일 오전에 프라하에 있을 때 방문 후보."},
+{city:"프라하",cat:"음식점",name:"Invitaly Pizza",emoji:"🍕",address:"Prague, Czechia",status:"미방문 · 후보",note:"마르게리타 피자와 라비올리 파스타 추천. 카르보나라는 평범했다는 메모.",menu:"마르게리타, 라비올리"},
+{city:"프라하",cat:"카페",name:"Café Kafíčko",emoji:"☕",address:"Prague, Czechia",status:"미방문 · 후보",note:"꿀케이크와 커피 맛집으로 저장."},
+{city:"프라하",cat:"카페",name:"Alma Coffee",emoji:"☕",address:"V Jirchářích 8, 110 00 Praha 1, Czechia",status:"카페 추천",note:"커피와 분위기가 좋고 낮에 방문 추천.",menu:"커피, 페이스트리",hours:"카페 매일 09:00–18:00 (공식 사이트 기준)",closed:"매일 영업 안내",url:"https://www.almaprague.cz/en"},
+{city:"프라하",cat:"카페",name:"Bistro Monk",emoji:"🥞",address:"Prague, Czechia",status:"브런치 강력 추천",star:true,note:"블루베리 팬케이크와 에그 베네딕트 추천."},
+{city:"프라하",cat:"카페",name:"Prokop",emoji:"🥐",address:"Prague, Czechia",status:"테이크아웃 후보",note:"피스타치오 크루아상 테이크아웃 추천."},
+{city:"프라하",cat:"카페",name:"I PPA Café",emoji:"🥐",address:"Prague, Czechia",status:"피스타치오 크루아상 추천",star:true,note:"피스타치오 크루아상 추천."},
+{city:"프라하",cat:"카페",name:"Cukrárna Myšák",emoji:"🍮",address:"Vodičkova 31, 110 00 Praha 1, Czechia",status:"디저트 강력 추천",star:true,note:"친절하고 바닐라 커스터드 디저트가 특히 맛있었다는 추천. 원문 작성자는 프라하에서 가장 맛있는 디저트로 꼽음.",menu:"바닐라 커스터드"},
+{city:"프라하",cat:"카페",name:"EMA espresso bar",emoji:"☕",address:"Prague, Czechia",status:"카페 후보",note:"방문 후보로 저장한 에스프레소 바."},
+{city:"프라하",cat:"카페",name:"Café Letka",emoji:"☕",address:"Prague, Czechia",status:"카페 후보",note:"방문 후보로 저장한 카페."},
+{city:"프라하",cat:"기념품",name:"Manufaktura",emoji:"🧴",address:"Prague, Czechia",status:"기념품 쇼핑",note:"맥주 샴푸는 선물용으로 괜찮다는 메모. 사용감은 개인차가 있음.",menu:"맥주 샴푸, 바디케어"},
+{city:"프라하",cat:"기념품",name:"Botanicus",emoji:"🌹",address:"Prague, Czechia",status:"미방문 · 참고",note:"로즈 오일 등 천연 화장품을 찾아볼 곳으로 저장."},
+{city:"프라하",cat:"기념품",name:"Havlík Apoteka",emoji:"🧴",address:"Prague, Czechia",status:"미방문 · 참고",note:"나이트크림, 수분크림 등 스킨케어 쇼핑 후보."},
+{city:"프라하",cat:"기념품",name:"Christmas Shop Praha",emoji:"🎄",address:"Prague Castle area, Prague, Czechia",status:"미방문 · 참고",note:"크리스마스 오너먼트와 캔들. 프라하성 근처라는 원문 메모."},
+{city:"프라하",cat:"기념품",name:"Local Artist",emoji:"🎨",address:"Prague, Czechia",status:"미방문 · 참고",note:"픽토그램 스타일 프라하 엽서가 예쁘다는 메모."},
+{city:"프라하",cat:"관광지",name:"구시가 광장 · Old Town Square",emoji:"🏛️",address:"Staroměstské náměstí, 110 00 Praha 1, Czechia",status:"크리스마스 마켓",note:"크리스마스 마켓 후보 장소."},
+{city:"프라하",cat:"관광지",name:"Náměstí Míru",emoji:"🎄",address:"Náměstí Míru, Praha 2, Czechia",status:"크리스마스 마켓",note:"크리스마스 마켓 후보 장소."},
+{city:"프라하",cat:"관광지",name:"Palladium 근처 마켓",emoji:"🎄",address:"Palladium, náměstí Republiky 1, Prague, Czechia",status:"크리스마스 마켓",note:"Palladium 근처 크리스마스 마켓 후보."},
+{city:"프라하",cat:"야경·전망",name:"Vyšehrad",emoji:"🌇",address:"Vyšehrad, Prague, Czechia",status:"강력 추천",star:true,note:"야경·노을 명소로 매우 추천. 지도에서 Vyšehrad tunnel을 검색해 계단으로 올라가는 경로를 찾아보라는 메모."},
+{city:"프라하",cat:"야경·전망",name:"Letná Park",emoji:"🌇",address:"Letná Park, Prague, Czechia",status:"노을 추천",star:true,note:"프라하성보다는 구시가지 전망이 좋음. 미리 가서 앉아 분홍빛 노을을 기다리는 것을 추천."},
+{city:"프라하",cat:"야경·전망",name:"Petřín",emoji:"🌄",address:"Petřínské sady, Prague, Czechia",status:"개인 취향 메모",note:"원문 작성자는 기대보다 평범했다고 기록. 프라하성 전망을 원한다면 Mánes Bridge가 더 예뻤고, 까를교보다 덜 붐비면서 까를교도 볼 수 있다는 메모."},
+{city:"프라하",cat:"야경·전망",name:"Mánes Bridge",emoji:"🌉",address:"Mánesův most, Prague, Czechia",status:"야경 포인트",note:"프라하성 전망과 까를교를 함께 보기 좋은 다리라는 추천."},
+{city:"체스키크룸로프",cat:"음식점",name:"Tavern of the Two Mareis",emoji:"🍖",address:"Český Krumlov, Czechia",status:"미방문 · 강변뷰 추천",note:"토끼고기가 특별한 곳. 음식보다 강변뷰가 아름다워 가능하면 강변 좌석 추천.",menu:"토끼고기"},
+{city:"체스키크룸로프",cat:"음식점",name:"Krčma Šatlava",emoji:"🔥",address:"Šatlavská 143, 381 01 Český Krumlov, Czechia",status:"방문함 · 예약 강력 추천",star:true,visited:true,note:"내부에서 식사하려면 예약하는 것이 좋다는 메모. 2인 바비큐 플래터 양이 매우 많아 남은 음식을 포장해 며칠 먹었다고 함. 고기 맛이 좋았고 특히 닭다리가 맛있었음. 완두콩죽을 곁들였고 식전 고기 페이스트도 제공됐다는 후기.",menu:"바비큐 플래터, 닭다리"},
+{city:"체스키크룸로프",cat:"음식점",name:"Don Julius Restaurant",emoji:"🍕",address:"Český Krumlov, Czechia",status:"미방문 · 후보",note:"피자와 간단한 맥주, 그릭 샐러드 추천."},
+{city:"체스키크룸로프",cat:"여행 팁",name:"체스키크룸로프 이동 메모",emoji:"🚌",address:"Český Krumlov, Czechia",status:"참고",note:"프라하에서 당일치기 또는 1박 일정으로 고려. 원문에는 부드바이저 양조장 투어와 Eggenberg 흑맥주도 추천되어 있음."}
+];
+const catsByCity={"비엔나":["전체","음식점","간식","펍·바","카페","관광지"],"프라하":["전체","음식점","간식","카페","펍·바","시장","기념품","관광지","야경·전망"],"체스키크룸로프":["전체","음식점","여행 팁"]};
+let city="비엔나",category="전체",view="all";
+const $=id=>document.getElementById(id);
+const mapsUrl=p=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(p.name+" "+p.address);
+const escapeHtml=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function getFavs(){try{return JSON.parse(localStorage.getItem("travelFavs")||"[]")}catch(e){return []}}
+function setFavs(a){localStorage.setItem("travelFavs",JSON.stringify(a))}
+function renderFilters(){ $("filters").innerHTML=catsByCity[city].map(c=>'<button class="chip '+(c===category?'active':'')+'" data-cat="'+escapeHtml(c)+'">'+escapeHtml(c)+'</button>').join("");}
+function render(){
+ const q=$("search").value.trim().toLowerCase(), favs=getFavs();
+ const rows=places.filter(p=>p.city===city&&(category==="전체"||p.cat===category)&&(view!=="favorites"||favs.includes(p.name))&&(view!=="visited"||p.visited)&&(!q||(p.name+" "+p.note+" "+(p.menu||"")+" "+p.status+" "+p.cat).toLowerCase().includes(q)));
+ $("listTitle").textContent=(view==="favorites"?"찜한 곳":view==="visited"?"가본 곳":city+" 추천 장소");
+ $("count").textContent=rows.length+"곳";
+ $("cards").innerHTML=rows.length?rows.map(p=>'<article class="card"><div class="card-top"><div class="emoji">'+p.emoji+'</div><div style="flex:1;min-width:0"><h3>'+escapeHtml(p.name)+'</h3><div class="sub">'+escapeHtml(p.cat)+' · '+escapeHtml(p.address)+'</div></div></div><div class="tags">'+(p.star?'<span class="tag star">⭐ 추천</span>':'')+(p.visited?'<span class="tag visited">☑ 가본 곳</span>':'')+'<span class="tag">'+escapeHtml(p.status||"저장한 장소")+'</span></div><div class="note">'+escapeHtml(p.note)+'</div>'+(p.menu?'<div class="meta"><strong>추천 메뉴</strong> · '+escapeHtml(p.menu)+'</div>':'')+((p.hours||p.closed)?'<div class="meta"><strong>영업시간</strong> · '+escapeHtml(p.hours||"최신 시간 지도에서 확인")+'<br><strong>휴무</strong> · '+escapeHtml(p.closed||"방문일 기준 지도·공식 사이트 확인")+'</div>':'<div class="meta"><strong>영업시간·휴무</strong> · 방문일 기준 Google Maps에서 확인</div>')+'<div class="actions"><a class="map" href="'+mapsUrl(p)+'" target="_blank" rel="noopener">📍 구글맵 위치</a><a href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(p.name+" "+p.address)+'" target="_blank" rel="noopener">🚶 길찾기</a>'+(p.url?'<a href="'+p.url+'" target="_blank" rel="noopener">🌐 공식 사이트</a>':'')+'<button class="fav '+(favs.includes(p.name)?'active':'')+'" data-fav="'+escapeHtml(p.name)+'">'+(favs.includes(p.name)?'♥ 찜 완료':'♡ 찜하기')+'</button></div></article>').join(""):'<div class="empty">조건에 맞는 장소가 없어요 🧭<br>다른 검색어나 카테고리를 선택해 봐요.</div>';
+}
+document.querySelectorAll("[data-city]").forEach(b=>b.addEventListener("click",()=>{city=b.dataset.city;category="전체";view="all";document.querySelectorAll("[data-city]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x.dataset.view==="all"));renderFilters();render()}));
+$("filters").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(!b)return;category=b.dataset.cat;renderFilters();render()});
+$("search").addEventListener("input",render);
+$("cards").addEventListener("click",e=>{const b=e.target.closest("[data-fav]");if(!b)return;let a=getFavs();const n=b.dataset.fav;a=a.includes(n)?a.filter(x=>x!==n):a.concat(n);setFavs(a);render()});
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x===b));render()}));
+renderFilters();render();
+</script>
+</body></html>
