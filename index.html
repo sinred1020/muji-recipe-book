@@ -558,9 +558,12 @@ function openRecipe(id,cookMode){
   currentRecipeId=id;
   const r=recipes.find(x=>String(x.id)===String(id));
   if(!r)return;
+  const modal=document.getElementById("modal");
   const sheet=document.getElementById("sheet");
-  if(!sheet)return;
-  sheet.style.display="flex";
+  if(!modal || !sheet)return;
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
+  sheet.style.display="block";
   sheet.innerHTML=`
     <div class="sheet-inner">
       <button onclick="closeRecipe()" style="float:right;border:0;background:#fff;font-size:24px">✕</button>
@@ -585,7 +588,13 @@ function openRecipe(id,cookMode){
   const savedServing=Number(localStorage.getItem("serving_"+id)||2);
   renderIngredients(id,savedServing);
 }
-function closeRecipe(){const s=document.getElementById("sheet");if(s)s.style.display="none";}
+function closeRecipe(){
+  const modal=document.getElementById("modal");
+  const s=document.getElementById("sheet");
+  if(modal) modal.classList.remove("show");
+  if(s) s.style.display="none";
+  document.body.style.overflow="";
+}
 let wakeLock=null;
 async function enableWakeLock(id){
   const status=document.getElementById("wakeStatus-"+id);
