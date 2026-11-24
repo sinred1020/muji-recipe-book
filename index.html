@@ -563,7 +563,8 @@ function openRecipe(id,cookMode){
   if(!modal || !sheet)return;
   modal.classList.add("show");
   document.body.style.overflow="hidden";
-  sheet.style.display="block";
+  sheet.style.display="flex";
+  sheet.style.flexDirection="column";
   sheet.innerHTML=`
     <div class="sheet-inner">
       <button onclick="closeRecipe()" style="float:right;border:0;background:#fff;font-size:24px">✕</button>
